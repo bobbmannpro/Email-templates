@@ -45,8 +45,8 @@ export default function App() {
           newAvail, setNewAvail, newAges, setNewAges, newBadge, setNewBadge,
           nameError, setNameError, togInst, updInst, addInst, removeInst } = instructors;
 
-  const { forecast, wxMode, setWxMode, manRows, wxErr, setWxErr, dc,
-          setupRows, updateRow, applyManual, genAutoWx, COND_LIST } = weather;
+  const { forecast, wxMode, setWxMode, manRows, wxErr, setWxErr, wxLoading, dc,
+          fetchLiveWx, setupRows, updateRow, applyManual, genAutoWx, COND_LIST } = weather;
 
   const { hTitle, setHTitle, hSub, setHSub, hBullets, setHBullets, cycleTemplate } = header;
 
@@ -227,9 +227,9 @@ export default function App() {
             {/* Weather */}
             <WeatherForecast
               wxMode={wxMode} setWxMode={setWxMode}
-              forecast={forecast} wxErr={wxErr} setWxErr={setWxErr}
+              forecast={forecast} wxErr={wxErr} setWxErr={setWxErr} wxLoading={wxLoading}
               manRows={manRows} startD={startD} dc={dc}
-              setupRows={setupRows} updateRow={updateRow}
+              fetchLiveWx={fetchLiveWx} setupRows={setupRows} updateRow={updateRow}
               applyManual={applyManual} genAutoWx={genAutoWx}
               COND_LIST={COND_LIST}
             />
@@ -240,6 +240,7 @@ export default function App() {
               hSub={hSub} setHSub={setHSub}
               hBullets={hBullets} setHBullets={setHBullets}
               cycleTemplate={cycleTemplate}
+              poolType={poolType} startD={startD} endD={endD}
             />
 
             <Btn onClick={() => setStep(2)} full disabled={!!dateError}>

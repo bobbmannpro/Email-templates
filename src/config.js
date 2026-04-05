@@ -1,3 +1,14 @@
+// ─── Deployment ───────────────────────────────────────────────────────────────
+// Absolute base URL used for instructor photo <img> tags inside generated emails.
+// Email clients open emails offline from any website context, so relative paths
+// won't resolve — the full URL is required.
+export const EMAIL_IMAGE_BASE = "https://bobbmannpro.github.io/Email-templates/photos";
+
+// ─── Weather (Open-Meteo — free, no API key required) ─────────────────────────
+// Coordinates for zip code 75230 (North Dallas, TX)
+export const WEATHER_LAT = 32.87;
+export const WEATHER_LON = -96.76;
+
 // ─── Brand Colors ─────────────────────────────────────────────────────────────
 export const NAVY = "#0b2545";
 export const BLUE = "#1e88c7";
@@ -20,12 +31,12 @@ export const SEASONAL_TEMPS = [
 
 // ─── Instructor Seed Data ─────────────────────────────────────────────────────
 export const SEED = [
-  { id: "bobby",    name: "Bobby Manning",  role: "Swim Pro · Head Swim Coach", ini: "BM", col: GOLD,      dark: true,  bb: "rgba(255,255,255,0.15)", bc: "#fff",    av: "Every day",    badge: "Available Every Day", ages: "All ages",  pro: true  },
-  { id: "riley_n",  name: "Riley Niksich",  role: "Swim Instructor",            ini: "RN", col: BLUE,      dark: false, bb: "#e6f5ee",               bc: "#1a8a5c", av: "Sat & Sun",    badge: "Sat & Sun",           ages: "Ages 3-12", pro: false },
-  { id: "riley_d",  name: "Riley Dyke",     role: "Swim Instructor",            ini: "RD", col: BLUE,      dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false },
-  { id: "madeline", name: "Madeline Shaw",  role: "Swim Instructor",            ini: "MS", col: BLUE,      dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false },
-  { id: "peyton",   name: "Peyton Ganss",   role: "Swim Instructor",            ini: "PG", col: "#5c6bc0", dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false },
-  { id: "ayden",    name: "Ayden Benel",    role: "Swim Instructor",            ini: "AB", col: "#26a69a", dark: false, bb: "#e0f2f1",               bc: "#00796b", av: "TBD",          badge: "Available",            ages: "All ages",  pro: false },
+  { id: "bobby",    name: "Bobby Manning",  role: "Swim Pro · Head Swim Coach", ini: "BM", col: GOLD,      dark: true,  bb: "rgba(255,255,255,0.15)", bc: "#fff",    av: "Every day",    badge: "Available Every Day", ages: "All ages",  pro: true,  photo: "bobby.jpg"    },
+  { id: "riley_n",  name: "Riley Niksich",  role: "Swim Instructor",            ini: "RN", col: BLUE,      dark: false, bb: "#e6f5ee",               bc: "#1a8a5c", av: "Sat & Sun",    badge: "Sat & Sun",           ages: "Ages 3-12", pro: false, photo: "riley_n.jpg"  },
+  { id: "riley_d",  name: "Riley Dyke",     role: "Swim Instructor",            ini: "RD", col: BLUE,      dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false, photo: "riley_d.jpg"  },
+  { id: "madeline", name: "Madeline Shaw",  role: "Swim Instructor",            ini: "MS", col: BLUE,      dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false, photo: "madeline.jpg" },
+  { id: "peyton",   name: "Peyton Ganss",   role: "Swim Instructor",            ini: "PG", col: "#5c6bc0", dark: false, bb: "#fff3e0",               bc: "#c77700", av: "Starting May", badge: "Starting May",         ages: "All ages",  pro: false, photo: "peyton.jpg"   },
+  { id: "ayden",    name: "Ayden Benel",    role: "Swim Instructor",            ini: "AB", col: "#26a69a", dark: false, bb: "#e0f2f1",               bc: "#00796b", av: "TBD",          badge: "Available",            ages: "All ages",  pro: false, photo: "ayden.jpg"    },
 ];
 
 // ─── Weather Condition List ───────────────────────────────────────────────────

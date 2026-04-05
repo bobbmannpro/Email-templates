@@ -258,23 +258,13 @@ export default function EmailPreview({ opts, pvMode }) {
                 marginBottom: n > 0 ? 12 : 0,
               }}
             >
-              <div
-                style={{
-                  width: 70,
-                  height: 70,
-                  borderRadius: "50%",
-                  background: "#e8a838",
-                  textAlign: "center",
-                  lineHeight: "70px",
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  color: "#0b2545",
-                  border: "2px solid #e8a838",
-                  flexShrink: 0,
-                }}
-              >
-                {insts.bobby.ini}
-              </div>
+              {insts.bobby.photo ? (
+                <img src={`/photos/${insts.bobby.photo}`} alt={insts.bobby.name} style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: 70, height: 70, borderRadius: "50%", background: "#e8a838", textAlign: "center", lineHeight: "70px", fontSize: 18, fontWeight: "bold", color: "#0b2545", border: "2px solid #e8a838", flexShrink: 0 }}>
+                  {insts.bobby.ini}
+                </div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#fff", fontWeight: "bold", margin: "0 0 2px" }}>
                   {insts.bobby.name}
@@ -342,23 +332,39 @@ export default function EmailPreview({ opts, pvMode }) {
                         minWidth: n <= 2 ? 0 : 140,
                       }}
                     >
-                      <div
-                        style={{
-                          width: psz,
-                          height: psz,
-                          borderRadius: "50%",
-                          background: s.col,
-                          margin: "0 auto 8px",
-                          textAlign: "center",
-                          lineHeight: psz + "px",
-                          fontSize: Math.floor(psz * 0.28),
-                          fontWeight: "bold",
-                          color: s.dark ? "#0b2545" : "#fff",
-                          border: "2px solid #1e88c7",
-                        }}
-                      >
-                        {s.ini}
-                      </div>
+                      {s.photo ? (
+                        <img
+                          src={`/photos/${s.photo}`}
+                          alt={s.name}
+                          style={{
+                            width: psz,
+                            height: psz,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            margin: "0 auto 8px",
+                            display: "block",
+                            border: "2px solid #1e88c7",
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: psz,
+                            height: psz,
+                            borderRadius: "50%",
+                            background: s.col,
+                            margin: "0 auto 8px",
+                            textAlign: "center",
+                            lineHeight: psz + "px",
+                            fontSize: Math.floor(psz * 0.28),
+                            fontWeight: "bold",
+                            color: s.dark ? "#0b2545" : "#fff",
+                            border: "2px solid #1e88c7",
+                          }}
+                        >
+                          {s.ini}
+                        </div>
+                      )}
                       <p style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "#0b2545", fontWeight: "bold", margin: "0 0 2px" }}>
                         {s.name}
                       </p>

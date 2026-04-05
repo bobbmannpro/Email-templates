@@ -1,4 +1,4 @@
-import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS, FORECAST_ZIP_LABEL, NAVY, BLUE, GOLD } from "../config.js";
+import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS, FORECAST_ZIP_LABEL, EMAIL_IMAGE_BASE } from "../config.js";
 import { fmtDate } from "./date.js";
 
 /**
@@ -89,10 +89,13 @@ export function buildInstructorBlock(instOrder, insts) {
   let bobbyHtml = "";
   if (hasBobby) {
     const b = insts.bobby;
+    const bobbyAvatar = b.photo
+      ? `<img src="${EMAIL_IMAGE_BASE}/${b.photo}" alt="${b.name}" width="82" height="82" style="width:82px;height:82px;border-radius:50%;object-fit:cover;border:3px solid #e8a838;display:block;" />`
+      : `<div style="width:82px;height:82px;border-radius:50%;background:#e8a838;text-align:center;line-height:82px;font-size:22px;font-weight:bold;color:#0b2545;border:3px solid #e8a838;">${b.ini}</div>`;
     bobbyHtml =
       `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b2545;border-radius:12px;margin-bottom:14px;">` +
       `<tr><td style="width:106px;padding:16px 0 16px 16px;vertical-align:top;">` +
-      `<div style="width:82px;height:82px;border-radius:50%;background:#e8a838;text-align:center;line-height:82px;font-size:22px;font-weight:bold;color:#0b2545;border:3px solid #e8a838;">${b.ini}</div>` +
+      bobbyAvatar +
       `</td><td style="padding:16px 16px 16px 10px;vertical-align:middle;">` +
       `<p style="font-family:Georgia,serif;font-size:16px;color:#fff;font-weight:bold;margin:0 0 2px;">${b.name}</p>` +
       `<p style="font-size:10px;color:#e8a838;font-weight:bold;margin:0 0 8px;">${b.role}</p>` +
@@ -111,7 +114,9 @@ export function buildInstructorBlock(instOrder, insts) {
         `<td style="width:${w};min-width:${n > 2 ? "130px" : "0"};padding:0 4px;vertical-align:top;">` +
         `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;">` +
         `<tr><td style="padding:${pad}px 8px;text-align:center;">` +
-        `<div style="width:${psz}px;height:${psz}px;border-radius:50%;background:${s.col};margin:0 auto 10px;text-align:center;line-height:${psz}px;font-size:${Math.floor(psz * 0.27)}px;font-weight:bold;color:${s.dark ? "#0b2545" : "#fff"};border:2px solid #1e88c7;">${s.ini}</div>` +
+        (s.photo
+          ? `<img src="${EMAIL_IMAGE_BASE}/${s.photo}" alt="${s.name}" width="${psz}" height="${psz}" style="width:${psz}px;height:${psz}px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:2px solid #1e88c7;" />`
+          : `<div style="width:${psz}px;height:${psz}px;border-radius:50%;background:${s.col};margin:0 auto 10px;text-align:center;line-height:${psz}px;font-size:${Math.floor(psz * 0.27)}px;font-weight:bold;color:${s.dark ? "#0b2545" : "#fff"};border:2px solid #1e88c7;">${s.ini}</div>`) +
         `<p style="font-family:Georgia,serif;font-size:${nsz}px;color:#0b2545;font-weight:bold;margin:0 0 2px;">${s.name}</p>` +
         `<p style="font-size:10px;color:#1e88c7;font-weight:bold;margin:0 0 8px;">${s.role}</p>` +
         `<p style="font-size:10px;color:#5a6a78;margin:0 0 2px;">📅 ${s.avail}</p>` +

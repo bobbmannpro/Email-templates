@@ -33,24 +33,24 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
             onChange={() => togInst(id)}
             style={{ width: 17, height: 17, cursor: "pointer", accentColor: BLUE }}
           />
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: "50%",
-              background: st.col,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 12,
-              fontWeight: "bold",
-              color: st.dark ? NAVY : "#fff",
-              border: `3px solid ${st.sel ? BLUE : "#e8ecf0"}`,
-              flexShrink: 0,
-            }}
-          >
-            {st.ini}
-          </div>
+          {st.photo ? (
+            <img
+              src={`/photos/${st.photo}`}
+              alt={st.name}
+              style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", border: `3px solid ${st.sel ? BLUE : "#e8ecf0"}`, flexShrink: 0 }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 42, height: 42, borderRadius: "50%", background: st.col,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 12, fontWeight: "bold", color: st.dark ? NAVY : "#fff",
+                border: `3px solid ${st.sel ? BLUE : "#e8ecf0"}`, flexShrink: 0,
+              }}
+            >
+              {st.ini}
+            </div>
+          )}
           <div>
             <div style={{ fontWeight: "bold", color: NAVY, fontSize: 14 }}>{st.name}</div>
             <div style={{ fontSize: 11, color: "#9aa8b5" }}>
@@ -120,23 +120,13 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
                   padding: 10,
                 }}
               >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: "50%",
-                    background: GOLD,
-                    textAlign: "center",
-                    lineHeight: "52px",
-                    fontSize: 14,
-                    fontWeight: "bold",
-                    color: NAVY,
-                    border: "2px solid #e8a838",
-                    flexShrink: 0,
-                  }}
-                >
-                  {st.ini}
-                </div>
+                {st.photo ? (
+                  <img src={`/photos/${st.photo}`} alt={st.name} style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 52, height: 52, borderRadius: "50%", background: GOLD, textAlign: "center", lineHeight: "52px", fontSize: 14, fontWeight: "bold", color: NAVY, border: "2px solid #e8a838", flexShrink: 0 }}>
+                    {st.ini}
+                  </div>
+                )}
                 <div>
                   <div style={{ color: "#fff", fontWeight: "bold", fontSize: 13 }}>{st.name}</div>
                   <div style={{ color: GOLD, fontSize: 10, fontWeight: "bold", marginBottom: 3 }}>{st.role}</div>

@@ -22,6 +22,7 @@ export function buildInitialInsts() {
       bb: s.bb,
       bc: s.bc,
       dark: s.dark,
+      photo: s.photo || null,
       custom: false,
     };
   }
@@ -92,6 +93,7 @@ export function useInstructors() {
         bb: "#e8f5e9",
         bc: "#2e7d32",
         dark: false,
+        photo: null,
         custom: true,
       },
     }));
