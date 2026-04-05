@@ -30,7 +30,7 @@ export async function fetchRealWeather(startDate, endDate) {
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", WEATHER_LAT);
   url.searchParams.set("longitude", WEATHER_LON);
-  url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max");
+  url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max");
   url.searchParams.set("temperature_unit", "fahrenheit");
   url.searchParams.set("timezone", "America/Chicago");
   url.searchParams.set("start_date", startDate);
@@ -40,12 +40,12 @@ export async function fetchRealWeather(startDate, endDate) {
   if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
   const data = await res.json();
 
-  const { time, temperature_2m_max, temperature_2m_min, weathercode, precipitation_probability_max } = data.daily;
+  const { time, temperature_2m_max, temperature_2m_min, weather_code, precipitation_probability_max } = data.daily;
 
   return time.map((isoDate, i) => {
     const d = new Date(isoDate + "T00:00:00");
     const label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }).replace(",", "");
-    const cond  = WMO_TO_COND[weathercode[i]] || "Sunny";
+    const cond  = WMO_TO_COND[weather_code[i]] || "Sunny";
     const rain  = precipitation_probability_max[i] != null ? precipitation_probability_max[i] + "%" : "2%";
     return {
       day:  label,

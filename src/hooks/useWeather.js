@@ -21,17 +21,31 @@ export function useWeather(startD, endD) {
 
   /**
    * Fetches a real weather forecast from Open-Meteo for zip 75230.
+   * Falls back to auto-generate if the date range is beyond the 16-day forecast window.
    */
   async function fetchLiveWx() {
     if (!startD) { setWxErr("Select a start date first."); return; }
     setWxErr("");
+
+    // Open-Meteo only forecasts up to 16 days from today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(startD);
+    const daysUntilStart = Math.round((start - today) / 86400000);
+    if (daysUntilStart > 16) {
+      setWxErr("Live weather only available within 16 days — using Auto-Generate for this date range.");
+      setForecast(generateWeather(startD, dc));
+      return;
+    }
+
     setWxLoading(true);
     try {
       const end = endD || startD;
       const data = await fetchRealWeather(startD, end);
       setForecast(data);
     } catch (e) {
-      setWxErr("Could not fetch live weather. Try Auto-Generate instead.");
+      setWxErr("Could not fetch live weather. Using Auto-Generate instead.");
+      setForecast(generateWeather(startD, dc));
     } finally {
       setWxLoading(false);
     }
