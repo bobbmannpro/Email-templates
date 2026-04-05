@@ -52,7 +52,7 @@ export function buildWeatherBlock(forecast) {
   const cells = forecast
     .map(
       (d) =>
-        `<td style="text-align:center;background:#f5f7f9;border:1px solid #e8ecf0;border-radius:8px;padding:8px 4px;min-width:58px;">` +
+        `<td style="text-align:center;background:#f5f7f9;border:1px solid #e8ecf0;border-radius:8px;padding:8px 4px;min-width:56px;max-width:80px;">` +
         `<p style="font-size:7px;font-weight:bold;color:#9aa8b5;text-transform:uppercase;margin:0;white-space:nowrap;">${d.day}</p>` +
         `<p style="font-size:15px;margin:2px 0;">${d.icon}</p>` +
         `<p style="font-size:13px;font-weight:bold;color:#0b2545;margin:0;">${d.high}</p>` +
@@ -63,8 +63,8 @@ export function buildWeatherBlock(forecast) {
   return (
     `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
     `<p style="font-family:Georgia,serif;font-size:17px;color:#0b2545;margin:0 0 12px;">${forecast.length}-Day Pool-Side Forecast</p>` +
-    `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">` +
-    `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;border-spacing:4px;white-space:nowrap;"><tr>${cells}</tr></table>` +
+    `<div class="scroll-x" style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;display:block;">` +
+    `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;border-spacing:4px;"><tr>${cells}</tr></table>` +
     `</div><p style="font-size:11px;color:#9aa8b5;margin:8px 0 0;">Forecast for ${FORECAST_ZIP_LABEL}</p></td></tr>`
   );
 }
@@ -128,8 +128,8 @@ export function buildInstructorBlock(instOrder, insts) {
     })
     .join("");
 
-  const scrollStyle = n > 2 ? "overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;" : "";
-  const tableStyle  = n <= 2 ? "width:100%;" : "white-space:nowrap;";
+  const scrollStyle = n > 2 ? "overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;display:block;padding-bottom:4px;" : "";
+  const tableStyle  = n <= 2 ? "width:100%;table-layout:fixed;" : "";
 
   return (
     `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
@@ -280,21 +280,24 @@ export function buildEmailHtml(opts) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 body,table,td,a{-webkit-text-size-adjust:100%;}
-table,td{border-collapse:collapse;}
-body{margin:0;padding:0;background:#e8ecf0;font-family:Arial,Helvetica,sans-serif;width:100%!important;}
-p,td,span,a{word-break:break-word;overflow-wrap:break-word;}
+*{box-sizing:border-box;}
+table,td{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;}
+body{margin:0;padding:0;background:#e8ecf0;font-family:Arial,Helvetica,sans-serif;width:100%!important;min-width:100%!important;}
+p,td,span,a,div{word-break:break-word;overflow-wrap:break-word;}
+img{max-width:100%;height:auto;display:block;}
 .con{width:100%!important;max-width:600px!important;}
+.scroll-x{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;display:block!important;}
 @media screen and (max-width:600px){.con{width:100%!important;}.pad{padding:14px 12px!important;}.hh{font-size:19px!important;}}
-@media screen and (max-width:400px){.pad{padding:12px 10px!important;}.hh{font-size:17px!important;}}
+@media screen and (max-width:400px){.pad{padding:12px 10px!important;}.hh{font-size:17px!important;}.nav-title{font-size:12px!important;}}
 </style></head>
 <body style="margin:0;padding:0;background:#e8ecf0;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8ecf0;"><tr><td align="center">
-<table cellpadding="0" cellspacing="0" border="0" align="center" class="con" style="width:100%;max-width:600px;background:#fff;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8ecf0;table-layout:fixed;"><tr><td align="center" style="padding:0;">
+<table cellpadding="0" cellspacing="0" border="0" align="center" class="con" style="width:100%;max-width:600px;background:#fff;table-layout:fixed;">
 
 <tr><td class="pad" style="background:#0b2545;padding:16px 20px;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 <td width="46" valign="middle"><div style="width:42px;height:42px;border-radius:50%;background:#1e88c7;text-align:center;line-height:42px;font-size:10px;font-weight:bold;color:#fff;border:2px solid rgba(255,255,255,0.4);">CFC</div></td>
-<td style="padding-left:12px;" valign="middle"><span style="font-family:Georgia,serif;font-size:15px;color:#fff;font-weight:bold;">Swim Lessons at Cooper Fitness Center</span></td>
+<td style="padding-left:12px;" valign="middle"><span class="nav-title" style="font-family:Georgia,serif;font-size:15px;color:#fff;font-weight:bold;word-break:break-word;">Swim Lessons at Cooper Fitness Center</span></td>
 </tr></table></td></tr>
 
 <tr><td class="pad" style="background:#f3f8fc;padding:20px;border-bottom:2px solid #1e88c7;">
