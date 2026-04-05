@@ -50,8 +50,8 @@ export async function fetchRealWeather(startDate, endDate) {
     return {
       day:  label,
       icon: weatherIcon(cond),
-      high: Math.round(temperature_2m_max[i]) + "°",
-      low:  Math.round(temperature_2m_min[i]) + "°",
+      high: temperature_2m_max[i] + "°",
+      low:  temperature_2m_min[i] + "°",
       rain,
     };
   });
