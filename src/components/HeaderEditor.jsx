@@ -1,7 +1,9 @@
 import { NAVY, BLUE } from "../config.js";
+import { EMAIL_SUBJECTS } from "../config.js";
 import { Card, SLabel } from "./ui.jsx";
 
 export default function HeaderEditor({
+  subjectId, changeSubject,
   hTitle, setHTitle,
   hSub, setHSub,
   hBullets, setHBullets,
@@ -9,15 +11,34 @@ export default function HeaderEditor({
 }) {
   return (
     <Card>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 6 }}>
         <SLabel text="Email Header" />
         <button
           onClick={cycleTemplate}
           aria-label="Shuffle to a random header"
-          style={{ background: BLUE, color: "#fff", border: "none", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: "bold", cursor: "pointer" }}
+          style={{ background: BLUE, color: "#fff", border: "none", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: "bold", cursor: "pointer", flexShrink: 0 }}
         >
           🔀 Shuffle
         </button>
+      </div>
+
+      {/* Subject dropdown */}
+      <div style={{ marginBottom: 12 }}>
+        <label htmlFor="email-subject" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Email Subject</label>
+        <select
+          id="email-subject"
+          value={subjectId}
+          onChange={(e) => changeSubject(e.target.value)}
+          style={{
+            width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0",
+            borderRadius: 8, fontSize: 13, color: NAVY, background: "#fff",
+            boxSizing: "border-box", cursor: "pointer",
+          }}
+        >
+          {EMAIL_SUBJECTS.map((s) => (
+            <option key={s.id} value={s.id}>{s.label}</option>
+          ))}
+        </select>
       </div>
 
       <div style={{ marginBottom: 10 }}>

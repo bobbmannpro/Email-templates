@@ -48,7 +48,7 @@ export default function App() {
   const { forecast, wxMode, setWxMode, manRows, wxErr, setWxErr, wxLoading, dc,
           fetchLiveWx, setupRows, updateRow, applyManual, genAutoWx, COND_LIST } = weather;
 
-  const { hTitle, setHTitle, hSub, setHSub, hBullets, setHBullets, cycleTemplate } = header;
+  const { subjectId, changeSubject, hTitle, setHTitle, hSub, setHSub, hBullets, setHBullets, cycleTemplate } = header;
 
   // ─── Date validation ─────────────────────────────────────────────────────────
   const dateError =
@@ -236,6 +236,7 @@ export default function App() {
 
             {/* Header */}
             <HeaderEditor
+              subjectId={subjectId} changeSubject={changeSubject}
               hTitle={hTitle} setHTitle={setHTitle}
               hSub={hSub} setHSub={setHSub}
               hBullets={hBullets} setHBullets={setHBullets}
