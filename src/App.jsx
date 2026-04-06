@@ -240,7 +240,6 @@ export default function App() {
               hSub={hSub} setHSub={setHSub}
               hBullets={hBullets} setHBullets={setHBullets}
               cycleTemplate={cycleTemplate}
-              poolType={poolType} startD={startD} endD={endD}
             />
 
             <Btn onClick={() => setStep(2)} full disabled={!!dateError}>

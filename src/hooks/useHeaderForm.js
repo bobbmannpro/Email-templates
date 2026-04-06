@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { HEADER_TEMPLATES } from "../config.js";
+import { HEADER_TEMPLATES, HEADER_TITLES } from "../config.js";
+
+function randomTitle() {
+  return HEADER_TITLES[Math.floor(Math.random() * HEADER_TITLES.length)];
+}
+
+function randomTemplate() {
+  return HEADER_TEMPLATES[Math.floor(Math.random() * HEADER_TEMPLATES.length)];
+}
 
 /**
  * Custom hook for managing the email header form state.
@@ -16,16 +24,13 @@ export function useHeaderForm() {
     "Personalized certified instruction",
     "All ages welcome",
   ]);
-  const [tplIdx, setTplIdx] = useState(0);
 
   /**
-   * Advances to the next header template and applies it to the form fields.
+   * Picks a random headline and a random subtitle+bullets template.
    */
   function cycleTemplate() {
-    const next = (tplIdx + 1) % HEADER_TEMPLATES.length;
-    setTplIdx(next);
-    const t = HEADER_TEMPLATES[next];
-    setHTitle(t.title);
+    const t = randomTemplate();
+    setHTitle(randomTitle());
     setHSub(t.subtitle);
     setHBullets([...t.bullets]);
   }
@@ -34,7 +39,6 @@ export function useHeaderForm() {
     hTitle, setHTitle,
     hSub, setHSub,
     hBullets, setHBullets,
-    tplIdx,
     cycleTemplate,
   };
 }

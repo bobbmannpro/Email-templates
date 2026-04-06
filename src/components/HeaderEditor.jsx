@@ -1,62 +1,24 @@
-import { useState } from "react";
 import { NAVY, BLUE } from "../config.js";
 import { Card, SLabel } from "./ui.jsx";
-import { generateHeader } from "../utils/ai.js";
 
 export default function HeaderEditor({
   hTitle, setHTitle,
   hSub, setHSub,
   hBullets, setHBullets,
   cycleTemplate,
-  poolType, startD, endD,
 }) {
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiErr, setAiErr]         = useState("");
-
-  async function handleAiGenerate() {
-    setAiErr("");
-    setAiLoading(true);
-    try {
-      const result = await generateHeader({ poolType, startD, endD });
-      setHTitle(result.title);
-      setHSub(result.subtitle);
-      setHBullets(result.bullets.slice(0, 4));
-    } catch (e) {
-      setAiErr("AI generation failed: " + e.message);
-    } finally {
-      setAiLoading(false);
-    }
-  }
-
   return (
     <Card>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 6, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 6 }}>
         <SLabel text="Email Header" />
-        <div style={{ display: "flex", gap: 6 }}>
-          <button
-            onClick={handleAiGenerate}
-            disabled={aiLoading}
-            aria-label="Generate header with AI"
-            style={{
-              background: aiLoading ? "#c0ccda" : "#6c47d9",
-              color: "#fff", border: "none", padding: "7px 14px",
-              borderRadius: 8, fontSize: 12, fontWeight: "bold",
-              cursor: aiLoading ? "default" : "pointer",
-            }}
-          >
-            {aiLoading ? "Generating…" : "✨ AI Generate"}
-          </button>
-          <button
-            onClick={cycleTemplate}
-            aria-label="Shuffle to next header template"
-            style={{ background: BLUE, color: "#fff", border: "none", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: "bold", cursor: "pointer" }}
-          >
-            Shuffle
-          </button>
-        </div>
+        <button
+          onClick={cycleTemplate}
+          aria-label="Shuffle to a random header"
+          style={{ background: BLUE, color: "#fff", border: "none", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: "bold", cursor: "pointer" }}
+        >
+          🔀 Shuffle
+        </button>
       </div>
-
-      {aiErr && <p style={{ color: "#c00", fontSize: 11, margin: "0 0 10px" }}>{aiErr}</p>}
 
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="header-headline" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Headline</label>
