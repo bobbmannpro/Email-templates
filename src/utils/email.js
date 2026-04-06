@@ -201,8 +201,11 @@ export function buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice)
   return (
     `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
     `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b2545;border-radius:12px;"><tr><td style="padding:20px;">` +
-    `<p style="font-size:11px;font-weight:bold;color:#e8a838;text-transform:uppercase;letter-spacing:1px;margin:0 0 6px;">Triathlon Training</p>` +
-    `<p style="font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:bold;margin:0 0 4px;">${triTitle || "Triathlon Swim Training"}</p>` +
+    `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;"><tr>` +
+    `<td valign="middle"><p style="font-size:11px;font-weight:bold;color:#e8a838;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px;">Triathlon Training</p>` +
+    `<p style="font-family:Georgia,serif;font-size:18px;color:#fff;font-weight:bold;margin:0;">${triTitle || "Triathlon Swim Training"}</p></td>` +
+    `<td width="60" valign="middle" style="text-align:right;"><img src="${EMAIL_IMAGE_BASE}/cfclogo.jpg" alt="Cooper Fitness Center" width="52" height="52" style="width:52px;height:52px;border-radius:8px;display:block;margin-left:auto;" /></td>` +
+    `</tr></table>` +
     (triDate ? `<p style="font-size:12px;color:#e8a838;font-weight:bold;margin:0 0 10px;">📅 ${fmtDate(triDate)}</p>` : "") +
     `<p style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;margin:0 0 14px;">${triDesc || "Train your swim leg with Coach Bobby."}</p>` +
     (triPrice ? `<p style="font-size:13px;color:#fff;font-weight:bold;margin:0 0 12px;">💰 ${triPrice}</p>` : "") +
@@ -224,8 +227,11 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
   return (
     `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
     `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8f6fc;border:1px solid #b3dff0;border-left:4px solid #1e88c7;border-radius:8px;"><tr><td style="padding:18px;">` +
-    `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 6px;">Cooper Cyclones Swim Team</p>` +
-    `<p style="font-family:Georgia,serif;font-size:18px;color:#0b2545;font-weight:bold;margin:0 0 8px;">${teamTitle || "Join the Cooper Cyclones!"}</p>` +
+    `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;"><tr>` +
+    `<td valign="middle"><p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px;">Cooper Cyclones Swim Team</p>` +
+    `<p style="font-family:Georgia,serif;font-size:18px;color:#0b2545;font-weight:bold;margin:0;">${teamTitle || "Join the Cooper Cyclones!"}</p></td>` +
+    `<td width="70" valign="middle" style="text-align:right;"><img src="${EMAIL_IMAGE_BASE}/cycloneslogo.png" alt="Cooper Cyclones" width="60" height="60" style="width:60px;height:60px;object-fit:contain;display:block;margin-left:auto;" /></td>` +
+    `</tr></table>` +
     `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 ${teamExtra ? "12px" : "14px"};">${teamDesc || "Year-round competitive swim team for youth athletes."}</p>` +
     (teamExtra ? `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 14px;">${teamExtra}</p>` : "") +
     `<a href="mailto:${COACH_EMAIL}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:9px 22px;border-radius:20px;">Email Coach Bobby</a>` +
@@ -296,7 +302,7 @@ img{max-width:100%;height:auto;display:block;}
 
 <tr><td class="pad" style="background:#0b2545;padding:16px 20px;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="46" valign="middle"><div style="width:42px;height:42px;border-radius:50%;background:#1e88c7;text-align:center;line-height:42px;font-size:10px;font-weight:bold;color:#fff;border:2px solid rgba(255,255,255,0.4);">CFC</div></td>
+<td width="56" valign="middle"><img src="${EMAIL_IMAGE_BASE}/cfclogo.jpg" alt="Cooper Fitness Center" width="48" height="48" style="width:48px;height:48px;border-radius:6px;display:block;" /></td>
 <td style="padding-left:12px;" valign="middle"><span class="nav-title" style="font-family:Georgia,serif;font-size:15px;color:#fff;font-weight:bold;word-break:break-word;">Swim Lessons at Cooper Fitness Center</span></td>
 </tr></table></td></tr>
 
