@@ -46,25 +46,11 @@ export default function EmailPreview({ opts, pvMode }) {
           gap: 10,
         }}
       >
-        <div
-          aria-label="Cooper Fitness Center logo"
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: "50%",
-            background: "#1e88c7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 9,
-            fontWeight: "bold",
-            color: "#fff",
-            border: "2px solid rgba(255,255,255,0.35)",
-            flexShrink: 0,
-          }}
-        >
-          CFC
-        </div>
+        <img
+          src={`${import.meta.env.BASE_URL}photos/cfclogo.jpg`}
+          alt="Cooper Fitness Center"
+          style={{ width: 42, height: 42, borderRadius: 6, objectFit: "cover", flexShrink: 0 }}
+        />
         <span
           style={{
             fontFamily: "Georgia,serif",
@@ -473,21 +459,17 @@ export default function EmailPreview({ opts, pvMode }) {
       {triOn && (
         <div style={{ ...sec }}>
           <div style={{ background: "#0b2545", borderRadius: 10, padding: "16px" }}>
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: "bold",
-                color: "#e8a838",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                margin: "0 0 5px",
-              }}
-            >
-              Triathlon Training
-            </p>
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 17, color: "#fff", fontWeight: "bold", margin: "0 0 4px" }}>
-              {triTitle}
-            </p>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+              <div>
+                <p style={{ fontSize: 10, fontWeight: "bold", color: "#e8a838", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>
+                  Triathlon Training
+                </p>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 17, color: "#fff", fontWeight: "bold", margin: 0 }}>
+                  {triTitle}
+                </p>
+              </div>
+              <img src={`${import.meta.env.BASE_URL}photos/cfclogo.jpg`} alt="Cooper Fitness Center" style={{ width: 46, height: 46, borderRadius: 8, objectFit: "cover", flexShrink: 0, marginLeft: 10 }} />
+            </div>
             {triDate && (
               <p style={{ fontSize: 11, color: "#e8a838", fontWeight: "bold", margin: "0 0 8px" }}>
                 📅 {fmtDate(triDate)}
@@ -534,21 +516,17 @@ export default function EmailPreview({ opts, pvMode }) {
               padding: "16px",
             }}
           >
-            <p
-              style={{
-                fontSize: 10,
-                fontWeight: "bold",
-                color: "#1e88c7",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                margin: "0 0 5px",
-              }}
-            >
-              Cooper Cyclones Swim Team
-            </p>
-            <p style={{ fontFamily: "Georgia,serif", fontSize: 17, color: "#0b2545", fontWeight: "bold", margin: "0 0 8px" }}>
-              {teamTitle}
-            </p>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+              <div>
+                <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 4px" }}>
+                  Cooper Cyclones Swim Team
+                </p>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: 17, color: "#0b2545", fontWeight: "bold", margin: 0 }}>
+                  {teamTitle}
+                </p>
+              </div>
+              <img src={`${import.meta.env.BASE_URL}photos/cycloneslogo.png`} alt="Cooper Cyclones" style={{ width: 54, height: 54, objectFit: "contain", flexShrink: 0, marginLeft: 10 }} />
+            </div>
             <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px" }}>{teamDesc}</p>
             {teamExtra && (
               <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px" }}>{teamExtra}</p>
