@@ -1,3 +1,8 @@
+// ─── AI Header Generation (Cloudflare Worker proxy) ──────────────────────────
+// After deploying cloudflare-worker/worker.js, paste your Worker URL here.
+// Example: "https://swim-ai.yourusername.workers.dev"
+export const AI_WORKER_URL = "https://swim-ai.bobbmannpro.workers.dev";
+
 // ─── Deployment ───────────────────────────────────────────────────────────────
 // Absolute base URL used for instructor photo <img> tags inside generated emails.
 // Email clients open emails offline from any website context, so relative paths

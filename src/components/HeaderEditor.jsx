@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NAVY, BLUE } from "../config.js";
 import { Card, SLabel } from "./ui.jsx";
-import { generateHeader, getApiKey, saveApiKey } from "../utils/ai.js";
+import { generateHeader } from "../utils/ai.js";
 
 export default function HeaderEditor({
   hTitle, setHTitle,
@@ -10,18 +10,10 @@ export default function HeaderEditor({
   cycleTemplate,
   poolType, startD, endD,
 }) {
-  const [apiKey, setApiKey]       = useState(getApiKey);
-  const [showKey, setShowKey]     = useState(!getApiKey());
   const [aiLoading, setAiLoading] = useState(false);
   const [aiErr, setAiErr]         = useState("");
 
-  // Keep local key state in sync with localStorage
-  useEffect(() => {
-    if (apiKey) saveApiKey(apiKey);
-  }, [apiKey]);
-
   async function handleAiGenerate() {
-    if (!apiKey.trim()) { setShowKey(true); setAiErr("Enter your Anthropic API key first."); return; }
     setAiErr("");
     setAiLoading(true);
     try {
@@ -30,12 +22,7 @@ export default function HeaderEditor({
       setHSub(result.subtitle);
       setHBullets(result.bullets.slice(0, 4));
     } catch (e) {
-      if (e.message === "NO_KEY") {
-        setShowKey(true);
-        setAiErr("Enter your Anthropic API key first.");
-      } else {
-        setAiErr("AI generation failed: " + e.message);
-      }
+      setAiErr("AI generation failed: " + e.message);
     } finally {
       setAiLoading(false);
     }
@@ -69,34 +56,7 @@ export default function HeaderEditor({
         </div>
       </div>
 
-      {/* API Key section */}
-      <div style={{ marginBottom: 10 }}>
-        <button
-          onClick={() => setShowKey((v) => !v)}
-          style={{ background: "none", border: "none", fontSize: 11, color: "#9aa8b5", cursor: "pointer", padding: 0, textDecoration: "underline" }}
-        >
-          {showKey ? "Hide API key" : apiKey ? "🔑 API key saved — click to change" : "🔑 Set Anthropic API key for AI generation"}
-        </button>
-        {showKey && (
-          <div style={{ marginTop: 6, display: "flex", gap: 6 }}>
-            <input
-              id="anthropic-key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-ant-..."
-              style={{ flex: 1, padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }}
-            />
-            <button
-              onClick={() => { saveApiKey(apiKey); setShowKey(false); setAiErr(""); }}
-              style={{ background: NAVY, color: "#fff", border: "none", padding: "6px 12px", borderRadius: 6, fontSize: 12, fontWeight: "bold", cursor: "pointer" }}
-            >
-              Save
-            </button>
-          </div>
-        )}
-        {aiErr && <p style={{ color: "#c00", fontSize: 11, margin: "6px 0 0" }}>{aiErr}</p>}
-      </div>
+      {aiErr && <p style={{ color: "#c00", fontSize: 11, margin: "0 0 10px" }}>{aiErr}</p>}
 
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="header-headline" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Headline</label>
