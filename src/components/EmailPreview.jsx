@@ -259,7 +259,7 @@ export default function EmailPreview({ opts, pvMode }) {
               }}
             >
               {insts.bobby.photo ? (
-                <img src={`/photos/${insts.bobby.photo}`} alt={insts.bobby.name} style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
+                <img src={`${import.meta.env.BASE_URL}photos/${insts.bobby.photo}`} alt={insts.bobby.name} style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
               ) : (
                 <div style={{ width: 70, height: 70, borderRadius: "50%", background: "#e8a838", textAlign: "center", lineHeight: "70px", fontSize: 18, fontWeight: "bold", color: "#0b2545", border: "2px solid #e8a838", flexShrink: 0 }}>
                   {insts.bobby.ini}
@@ -334,7 +334,7 @@ export default function EmailPreview({ opts, pvMode }) {
                     >
                       {s.photo ? (
                         <img
-                          src={`/photos/${s.photo}`}
+                          src={`${import.meta.env.BASE_URL}photos/${s.photo}`}
                           alt={s.name}
                           style={{
                             width: psz,

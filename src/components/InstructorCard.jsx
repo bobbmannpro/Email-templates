@@ -35,7 +35,7 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
           />
           {st.photo ? (
             <img
-              src={`/photos/${st.photo}`}
+              src={`${import.meta.env.BASE_URL}photos/${st.photo}`}
               alt={st.name}
               style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", border: `3px solid ${st.sel ? BLUE : "#e8ecf0"}`, flexShrink: 0 }}
             />
@@ -121,7 +121,7 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
                 }}
               >
                 {st.photo ? (
-                  <img src={`/photos/${st.photo}`} alt={st.name} style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
+                  <img src={`${import.meta.env.BASE_URL}photos/${st.photo}`} alt={st.name} style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #e8a838", flexShrink: 0 }} />
                 ) : (
                   <div style={{ width: 52, height: 52, borderRadius: "50%", background: GOLD, textAlign: "center", lineHeight: "52px", fontSize: 14, fontWeight: "bold", color: NAVY, border: "2px solid #e8a838", flexShrink: 0 }}>
                     {st.ini}
