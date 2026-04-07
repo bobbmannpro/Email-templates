@@ -30,6 +30,7 @@ export default function App() {
   );
   const [triPrice, setTriPrice] = useState("$120/hour");
   const [teamOn, setTeamOn]     = useState(false);
+  const [poolCondOn, setPoolCondOn] = useState(false);
   const [teamTitle, setTeamTitle] = useState("Join the Cooper Cyclones!");
   const [teamDesc, setTeamDesc]   = useState(
     "Year-round competitive swim team for youth athletes of all levels. USA Swimming sanctioned meets, structured training, and an incredible team culture."
@@ -63,6 +64,7 @@ export default function App() {
       title: hTitle, subtitle: hSub, bullets: hBullets,
       triOn, triDate, triTitle, triDesc, triPrice,
       teamOn, teamTitle, teamDesc, teamExtra,
+      poolCondOn,
     };
   }
 
@@ -431,6 +433,23 @@ export default function App() {
                     )}
                   </div>
                 </>
+              )}
+            </Card>
+
+            {/* Pool Conditions */}
+            <Card>
+              <ToggleRow
+                on={poolCondOn}
+                onToggle={() => setPoolCondOn((prev) => !prev)}
+                label="Outdoor Pool Conditions"
+                sub="Add temperature info and cancellation policy"
+              />
+              {poolCondOn && (
+                <div style={{ marginTop: 8, padding: 12, background: "#f0f8ff", border: "1px solid #b8d8f0", borderLeft: "4px solid #1e88c7", borderRadius: 8, fontSize: 12, lineHeight: 1.8, color: "#2a3d4d" }}>
+                  <div>🌡️ <strong>Outdoor pools are heated to 80°F</strong></div>
+                  <div>👶 <strong>Recommended air temp for ages 6 &amp; under:</strong> 70°F or warmer</div>
+                  <div>📲 <strong>Weather cancellations:</strong> You will be contacted directly if a session is cancelled</div>
+                </div>
               )}
             </Card>
 

@@ -7,6 +7,7 @@ export default function EmailPreview({ opts, pvMode }) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
+    poolCondOn,
   } = opts;
 
   const maxW  = pvMode === "mobile" ? 375 : 600;
@@ -189,6 +190,29 @@ export default function EmailPreview({ opts, pvMode }) {
           </div>
         )}
       </div>
+
+      {/* Pool Conditions */}
+      {poolCondOn && (
+        <div style={{ ...sec }}>
+          <div style={{ background: "#f0f8ff", border: "1px solid #b8d8f0", borderLeft: "4px solid #1e88c7", borderRadius: 8, padding: "12px 14px" }}>
+            <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>
+              Outdoor Pool Conditions
+            </p>
+            <div style={{ display: "flex", gap: 8, marginBottom: 7, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 15 }}>🌡️</span>
+              <p style={{ ...small, color: "#2a3d4d", margin: 0 }}><strong>Pools are heated to 80°F</strong> — comfortable for swimming regardless of the outside temperature.</p>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 7, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 15 }}>👶</span>
+              <p style={{ ...small, color: "#2a3d4d", margin: 0 }}><strong>Ages 6 and under:</strong> We recommend an air temperature of <strong>70°F or warmer</strong> for young swimmers.</p>
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 15 }}>📲</span>
+              <p style={{ ...small, color: "#2a3d4d", margin: 0 }}><strong>Weather cancellations:</strong> You will be contacted directly if your session needs to be cancelled due to weather.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Weather */}
       {forecast && forecast.length > 0 && (

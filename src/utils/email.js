@@ -240,6 +240,26 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
 }
 
 /**
+ * Builds the outdoor pool conditions HTML block.
+ * @param {boolean} poolCondOn
+ * @returns {string} HTML table row string, or "" if poolCondOn is false
+ */
+export function buildPoolCondBlock(poolCondOn) {
+  if (!poolCondOn) return "";
+  return (
+    `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
+    `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f8ff;border:1px solid #b8d8f0;border-left:4px solid #1e88c7;border-radius:8px;"><tr><td style="padding:14px 16px;">` +
+    `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Outdoor Pool Conditions</p>` +
+    `<table width="100%" cellpadding="0" cellspacing="0" border="0">` +
+    `<tr><td width="28" valign="top" style="font-size:16px;padding-bottom:8px;">🌡️</td><td style="font-size:12px;color:#2a3d4d;line-height:1.6;padding-bottom:8px;"><strong>Pools are heated to 80°F</strong> — comfortable for swimming regardless of the outside temperature.</td></tr>` +
+    `<tr><td width="28" valign="top" style="font-size:16px;padding-bottom:8px;">👶</td><td style="font-size:12px;color:#2a3d4d;line-height:1.6;padding-bottom:8px;"><strong>Ages 6 and under:</strong> We recommend an air temperature of <strong>70°F or warmer</strong> for young swimmers.</td></tr>` +
+    `<tr><td width="28" valign="top" style="font-size:16px;">📲</td><td style="font-size:12px;color:#2a3d4d;line-height:1.6;"><strong>Weather cancellations:</strong> You will be contacted directly if your session needs to be cancelled due to weather.</td></tr>` +
+    `</table>` +
+    `</td></tr></table></td></tr>`
+  );
+}
+
+/**
  * Builds the complete HTML email string.
  * @param {Object} opts - All email options
  * @param {string} opts.poolType
@@ -268,6 +288,7 @@ export function buildEmailHtml(opts) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
+    poolCondOn,
   } = opts;
 
   const dr = startD && endD
@@ -319,7 +340,7 @@ img{max-width:100%;height:auto;display:block;}
 <p style="font-size:11px;color:rgba(255,255,255,0.9);margin:3px 0 0;">No Cooper membership needed. Everyone is invited.</p>
 </td></tr>
 
-${buildPoolBlock(poolType)}${buildWeatherBlock(forecast)}${buildInstructorBlock(instOrder, insts)}
+${buildPoolBlock(poolType)}${buildPoolCondBlock(poolCondOn)}${buildWeatherBlock(forecast)}${buildInstructorBlock(instOrder, insts)}
 
 ${buildRatesBlock()}
 
