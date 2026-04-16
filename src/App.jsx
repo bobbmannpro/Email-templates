@@ -29,8 +29,27 @@ export default function App() {
     "Train your swim leg with Coach Bobby - personalized sessions for sprint, Olympic, and 70.3 distances."
   );
   const [triPrice, setTriPrice] = useState("$120/hour");
-  const [teamOn, setTeamOn]     = useState(false);
+  const [teamOn, setTeamOn]         = useState(false);
   const [poolCondOn, setPoolCondOn] = useState(false);
+
+  // Per-section visibility (all on by default)
+  const [showBanner,     setShowBanner]     = useState(true);
+  const [showPoolLoc,    setShowPoolLoc]    = useState(true);
+  const [showWeather,    setShowWeather]    = useState(true);
+  const [showInstructors,setShowInstructors]= useState(true);
+  const [showRates,      setShowRates]      = useState(true);
+  const [showFooterCta,  setShowFooterCta]  = useState(true);
+  const [spotlights, setSpotlights] = useState({});   // { [id]: { on, bio, fun } }
+
+  function toggleSpotlight(id) {
+    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), on: !prev[id]?.on } }));
+  }
+  function updateSpotlight(id, key, val) {
+    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), [key]: val } }));
+  }
+  function defaultSpot(existing) {
+    return { on: false, bio: "", fun: "", ...existing };
+  }
   const [teamTitle, setTeamTitle] = useState("Join the Cooper Cyclones!");
   const [teamDesc, setTeamDesc]   = useState(
     "Year-round competitive swim team for youth athletes of all levels. USA Swimming sanctioned meets, structured training, and an incredible team culture."
@@ -64,7 +83,8 @@ export default function App() {
       title: hTitle, subtitle: hSub, bullets: hBullets,
       triOn, triDate, triTitle, triDesc, triPrice,
       teamOn, teamTitle, teamDesc, teamExtra,
-      poolCondOn,
+      poolCondOn, spotlights,
+      showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
     };
   }
 
@@ -319,139 +339,173 @@ export default function App() {
         {/* ═══════════════ STEP 3 ═══════════════ */}
         {step === 3 && (
           <>
-            {/* Triathlon */}
             <Card>
-              <ToggleRow
-                on={triOn}
-                onToggle={() => setTriOn((prev) => !prev)}
-                label="Triathlon Training"
-                sub="Feature a triathlon spotlight in this email"
-              />
-              {triOn && (
-                <>
-                  <div style={{ marginBottom: 10 }}>
-                    <label
-                      htmlFor="tri-date"
-                      style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}
+              <SLabel text="Email Sections" />
+              <p style={{ fontSize: 11, color: "#9aa8b5", margin: "0 0 14px" }}>
+                Toggle each section on or off. Sections with settings expand when turned on.
+              </p>
+
+              {/* Helper to render a section row */}
+              {[
+                { key: "header",       label: "Header & Logo",           locked: true },
+                { key: "hero",         label: "Headline & Subtitle",      locked: true },
+                { key: "banner",       label: "Non-Members Welcome Banner", on: showBanner,      set: setShowBanner },
+                { key: "poolLoc",      label: "Pool Location Info",       on: showPoolLoc,     set: setShowPoolLoc },
+                { key: "poolCond",     label: "Outdoor Pool Conditions",  on: poolCondOn,      set: setPoolCondOn },
+                { key: "weather",      label: "Weather Forecast",         on: showWeather,     set: setShowWeather },
+                { key: "instructors",  label: "Meet Your Instructors",    on: showInstructors, set: setShowInstructors },
+                { key: "spotlights",   label: "Instructor Spotlights",    on: Object.values(spotlights).some(s => s.on), custom: true },
+                { key: "rates",        label: "Lesson Rates",             on: showRates,       set: setShowRates },
+                { key: "triathlon",    label: "Triathlon Training",       on: triOn,           set: setTriOn },
+                { key: "cyclones",     label: "Cooper Cyclones",          on: teamOn,          set: setTeamOn },
+                { key: "footerCta",    label: "Footer Call-to-Action",    on: showFooterCta,   set: setShowFooterCta },
+              ].map(({ key, label, locked, on, set, custom }) => (
+                <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f3f6" }}>
+                  <span style={{ fontSize: 13, color: locked ? "#b0bcc8" : NAVY, fontWeight: locked ? "normal" : "500" }}>{label}</span>
+                  {locked ? (
+                    <span style={{ fontSize: 10, color: "#b0bcc8", background: "#f0f3f6", padding: "2px 8px", borderRadius: 10 }}>Always On</span>
+                  ) : custom ? (
+                    <span style={{ fontSize: 10, color: BLUE }}>Configured below ↓</span>
+                  ) : (
+                    <button
+                      onClick={() => set(v => !v)}
+                      style={{
+                        width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                        background: on ? BLUE : "#d0d8e0", position: "relative", transition: "background 0.2s", flexShrink: 0,
+                      }}
+                      aria-label={`Toggle ${label}`}
                     >
-                      Event / Session Date
-                    </label>
-                    <input
-                      id="tri-date"
-                      type="date"
-                      value={triDate}
-                      onChange={(e) => setTriDate(e.target.value)}
-                      style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 13, boxSizing: "border-box" }}
-                    />
-                    {triDate && (
-                      <div style={{ marginTop: 4, fontSize: 12, color: BLUE, fontWeight: "bold" }}>
-                        📅 {fmtDate(triDate)}
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                    <div style={{ flex: "1 1 120px" }}>
-                      <label htmlFor="tri-title" style={{ display: "block", fontSize: 10, color: "#5a6a78", marginBottom: 3 }}>Title</label>
-                      <input id="tri-title" value={triTitle} onChange={(e) => setTriTitle(e.target.value)} placeholder="Triathlon Swim Training"
-                        style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }} />
-                    </div>
-                    <div style={{ flex: "1 1 120px" }}>
-                      <label htmlFor="tri-price" style={{ display: "block", fontSize: 10, color: "#5a6a78", marginBottom: 3 }}>Price / Rate</label>
-                      <input id="tri-price" value={triPrice} onChange={(e) => setTriPrice(e.target.value)} placeholder="$120/hour"
-                        style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }} />
-                    </div>
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <label htmlFor="tri-desc" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Description</label>
-                    <textarea
-                      id="tri-desc"
-                      value={triDesc}
-                      onChange={(e) => setTriDesc(e.target.value)}
-                      rows={3}
-                      style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
-                    />
-                  </div>
-                  <div style={{ padding: 12, background: "#0b2545", borderRadius: 8 }}>
-                    <div style={{ fontSize: 9, color: GOLD, fontWeight: "bold", textTransform: "uppercase", marginBottom: 4 }}>Preview</div>
-                    <div style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "#fff", fontWeight: "bold", marginBottom: 2 }}>{triTitle}</div>
-                    {triDate && <div style={{ fontSize: 11, color: GOLD, marginBottom: 4 }}>📅 {fmtDate(triDate)}</div>}
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>{triDesc}</div>
-                    {triPrice && <div style={{ fontSize: 12, color: "#fff", fontWeight: "bold", marginTop: 6 }}>💰 {triPrice}</div>}
-                  </div>
-                </>
-              )}
+                      <span style={{
+                        position: "absolute", top: 3, left: on ? 21 : 3,
+                        width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                        transition: "left 0.2s", display: "block",
+                      }} />
+                    </button>
+                  )}
+                </div>
+              ))}
             </Card>
 
-            {/* Swim Team */}
-            <Card>
-              <ToggleRow
-                on={teamOn}
-                onToggle={() => setTeamOn((prev) => !prev)}
-                label="Cooper Cyclones Swim Team"
-                sub="Feature a swim team spotlight in this email"
-              />
-              {teamOn && (
-                <>
-                  <div style={{ marginBottom: 8 }}>
-                    <label htmlFor="team-title" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Title</label>
-                    <input
-                      id="team-title"
-                      value={teamTitle}
-                      onChange={(e) => setTeamTitle(e.target.value)}
-                      style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 13, boxSizing: "border-box" }}
-                    />
-                  </div>
-                  <div style={{ marginBottom: 8 }}>
-                    <label htmlFor="team-desc" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Description</label>
-                    <textarea
-                      id="team-desc"
-                      value={teamDesc}
-                      onChange={(e) => setTeamDesc(e.target.value)}
-                      rows={2}
-                      style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
-                    />
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <label htmlFor="team-extra" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>
-                      Additional Details (optional)
-                    </label>
-                    <textarea
-                      id="team-extra"
-                      value={teamExtra}
-                      onChange={(e) => setTeamExtra(e.target.value)}
-                      rows={2}
-                      placeholder="e.g. Practice Mon/Wed/Fri 5-7pm, USA Swimming sanctioned meets"
-                      style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
-                    />
-                  </div>
-                  <div style={{ padding: 12, background: "#e8f6fc", border: "1px solid #b3dff0", borderLeft: "4px solid #1e88c7", borderRadius: 8 }}>
-                    <div style={{ fontSize: 9, color: BLUE, fontWeight: "bold", textTransform: "uppercase", marginBottom: 4 }}>Preview</div>
-                    <div style={{ fontFamily: "Georgia,serif", fontSize: 15, color: NAVY, fontWeight: "bold", marginBottom: 4 }}>{teamTitle}</div>
-                    <div style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.5 }}>{teamDesc}</div>
-                    {teamExtra && (
-                      <div style={{ fontSize: 11, color: "#5a6a78", marginTop: 6, lineHeight: 1.5 }}>{teamExtra}</div>
-                    )}
-                  </div>
-                </>
-              )}
-            </Card>
-
-            {/* Pool Conditions */}
-            <Card>
-              <ToggleRow
-                on={poolCondOn}
-                onToggle={() => setPoolCondOn((prev) => !prev)}
-                label="Outdoor Pool Conditions"
-                sub="Add temperature info and cancellation policy"
-              />
-              {poolCondOn && (
-                <div style={{ marginTop: 8, padding: 12, background: "#f0f8ff", border: "1px solid #b8d8f0", borderLeft: "4px solid #1e88c7", borderRadius: 8, fontSize: 12, lineHeight: 1.8, color: "#2a3d4d" }}>
+            {/* ── Pool Conditions config ── */}
+            {poolCondOn && (
+              <Card>
+                <SLabel text="Outdoor Pool Conditions" />
+                <div style={{ padding: 12, background: "#f0f8ff", border: "1px solid #b8d8f0", borderLeft: "4px solid #1e88c7", borderRadius: 8, fontSize: 12, lineHeight: 1.8, color: "#2a3d4d" }}>
                   <div>🌡️ <strong>Outdoor pools are heated to 80°F</strong></div>
                   <div>👶 <strong>Recommended air temp for ages 6 &amp; under:</strong> 70°F or warmer</div>
                   <div>📲 <strong>Weather cancellations:</strong> You will be contacted directly if a session is cancelled</div>
                 </div>
-              )}
-            </Card>
+              </Card>
+            )}
+
+            {/* ── Instructor Spotlights config ── */}
+            {instOrder.map((id) => {
+              const inst = insts[id];
+              if (!inst) return null;
+              const spot = spotlights[id] || { on: false, bio: "", fun: "" };
+              return (
+                <Card key={id}>
+                  <ToggleRow
+                    on={spot.on}
+                    onToggle={() => toggleSpotlight(id)}
+                    label={`${inst.name} Spotlight`}
+                    sub={inst.role}
+                  />
+                  {spot.on && (
+                    <>
+                      <div style={{ marginTop: 10, marginBottom: 8 }}>
+                        <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Bio / Description</label>
+                        <textarea
+                          value={spot.bio}
+                          onChange={(e) => updateSpotlight(id, "bio", e.target.value)}
+                          rows={3}
+                          placeholder={`Background, specialty, teaching style...`}
+                          style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: 10 }}>
+                        <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Fun Fact (optional)</label>
+                        <input
+                          value={spot.fun}
+                          onChange={(e) => updateSpotlight(id, "fun", e.target.value)}
+                          placeholder="e.g. Competed in 3 triathlons, former varsity swimmer..."
+                          style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                        />
+                      </div>
+                      <div style={{ padding: 10, background: "#f5f7f9", border: "1px solid #e8ecf0", borderRadius: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                        {inst.photo ? (
+                          <img src={`${import.meta.env.BASE_URL}photos/${inst.photo}`} alt={inst.name}
+                            style={{ width: 46, height: 46, borderRadius: "50%", objectFit: "cover", border: `2px solid ${BLUE}`, flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 46, height: 46, borderRadius: "50%", background: inst.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: "bold", color: inst.dark ? NAVY : "#fff", border: `2px solid ${BLUE}`, flexShrink: 0 }}>
+                            {inst.ini}
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ fontWeight: "bold", color: NAVY, fontSize: 12 }}>{inst.name}</div>
+                          <div style={{ fontSize: 10, color: BLUE, marginBottom: 3 }}>{inst.role}</div>
+                          {spot.bio && <div style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.4 }}>{spot.bio}</div>}
+                          {spot.fun && <div style={{ fontSize: 10, color: GOLD, fontWeight: "bold", marginTop: 3 }}>⭐ {spot.fun}</div>}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </Card>
+              );
+            })}
+
+            {/* ── Triathlon config ── */}
+            {triOn && (
+              <Card>
+                <SLabel text="Triathlon Training" />
+                <div style={{ marginBottom: 10 }}>
+                  <label htmlFor="tri-date" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Event / Session Date</label>
+                  <input id="tri-date" type="date" value={triDate} onChange={(e) => setTriDate(e.target.value)}
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 13, boxSizing: "border-box" }} />
+                  {triDate && <div style={{ marginTop: 4, fontSize: 12, color: BLUE, fontWeight: "bold" }}>📅 {fmtDate(triDate)}</div>}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                  <div style={{ flex: "1 1 120px" }}>
+                    <label htmlFor="tri-title" style={{ display: "block", fontSize: 10, color: "#5a6a78", marginBottom: 3 }}>Title</label>
+                    <input id="tri-title" value={triTitle} onChange={(e) => setTriTitle(e.target.value)} placeholder="Triathlon Swim Training"
+                      style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }} />
+                  </div>
+                  <div style={{ flex: "1 1 120px" }}>
+                    <label htmlFor="tri-price" style={{ display: "block", fontSize: 10, color: "#5a6a78", marginBottom: 3 }}>Price / Rate</label>
+                    <input id="tri-price" value={triPrice} onChange={(e) => setTriPrice(e.target.value)} placeholder="$120/hour"
+                      style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="tri-desc" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Description</label>
+                  <textarea id="tri-desc" value={triDesc} onChange={(e) => setTriDesc(e.target.value)} rows={3}
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }} />
+                </div>
+              </Card>
+            )}
+
+            {/* ── Cyclones config ── */}
+            {teamOn && (
+              <Card>
+                <SLabel text="Cooper Cyclones Swim Team" />
+                <div style={{ marginBottom: 8 }}>
+                  <label htmlFor="team-title" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Title</label>
+                  <input id="team-title" value={teamTitle} onChange={(e) => setTeamTitle(e.target.value)}
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 13, boxSizing: "border-box" }} />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <label htmlFor="team-desc" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Description</label>
+                  <textarea id="team-desc" value={teamDesc} onChange={(e) => setTeamDesc(e.target.value)} rows={2}
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }} />
+                </div>
+                <div>
+                  <label htmlFor="team-extra" style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Additional Details (optional)</label>
+                  <textarea id="team-extra" value={teamExtra} onChange={(e) => setTeamExtra(e.target.value)} rows={2}
+                    placeholder="e.g. Practice Mon/Wed/Fri 5-7pm, USA Swimming sanctioned meets"
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }} />
+                </div>
+              </Card>
+            )}
 
             <div style={{ display: "flex", gap: 8 }}>
               <Btn onClick={() => setStep(2)} color="#8899aa">Back</Btn>

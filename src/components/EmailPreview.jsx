@@ -7,7 +7,8 @@ export default function EmailPreview({ opts, pvMode }) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
-    poolCondOn,
+    poolCondOn, spotlights,
+    showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
   } = opts;
 
   const maxW  = pvMode === "mobile" ? 375 : 600;
@@ -97,7 +98,7 @@ export default function EmailPreview({ opts, pvMode }) {
       </div>
 
       {/* Banner */}
-      <div style={{ background: "#e8a838", padding: "10px 18px", textAlign: "center" }}>
+      {showBanner !== false && <div style={{ background: "#e8a838", padding: "10px 18px", textAlign: "center" }}>
         <p
           style={{
             fontFamily: "Georgia,serif",
@@ -112,10 +113,10 @@ export default function EmailPreview({ opts, pvMode }) {
         <p style={{ fontSize: 11, color: "rgba(255,255,255,0.9)", margin: "3px 0 0" }}>
           No Cooper membership needed. Everyone is invited.
         </p>
-      </div>
+      </div>}
 
       {/* Pool */}
-      <div style={{ ...sec }}>
+      {showPoolLoc !== false && <div style={{ ...sec }}>
         {poolType === "hotel" ? (
           <div
             style={{
@@ -189,7 +190,7 @@ export default function EmailPreview({ opts, pvMode }) {
             </p>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Pool Conditions */}
       {poolCondOn && (
@@ -215,7 +216,7 @@ export default function EmailPreview({ opts, pvMode }) {
       )}
 
       {/* Weather */}
-      {forecast && forecast.length > 0 && (
+      {showWeather !== false && forecast && forecast.length > 0 && (
         <div style={{ ...sec }}>
           <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 10px" }}>
             {forecast.length}-Day Pool-Side Forecast
@@ -250,7 +251,7 @@ export default function EmailPreview({ opts, pvMode }) {
       )}
 
       {/* Instructors */}
-      {selIds.length > 0 && (
+      {showInstructors !== false && selIds.length > 0 && (
         <div style={{ ...sec }}>
           <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 12px" }}>
             Meet Your Instructors
@@ -426,7 +427,7 @@ export default function EmailPreview({ opts, pvMode }) {
       )}
 
       {/* Rates summary */}
-      <div style={{ ...sec }}>
+      {showRates !== false && <div style={{ ...sec }}>
         <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 10px" }}>
           Lesson Rates
         </p>
@@ -477,7 +478,43 @@ export default function EmailPreview({ opts, pvMode }) {
             Book Now
           </a>
         </div>
-      </div>
+      </div>}
+
+      {/* Instructor Spotlights */}
+      {spotlights && instOrder.filter((id) => insts[id] && spotlights[id]?.on).map((id) => {
+        const s  = insts[id];
+        const sp = spotlights[id];
+        const isBobby = id === "bobby";
+        return (
+          <div key={id} style={{ ...sec }}>
+            <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>
+              Instructor Spotlight
+            </p>
+            <div style={{ background: isBobby ? "#0b2545" : "#f5f7f9", border: isBobby ? "none" : "1px solid #e8ecf0", borderRadius: 10, padding: 14, display: "flex", gap: 12, alignItems: "flex-start" }}>
+              {s.photo ? (
+                <img src={`${import.meta.env.BASE_URL}photos/${s.photo}`} alt={s.name}
+                  style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: `3px solid ${isBobby ? "#e8a838" : "#1e88c7"}`, flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: s.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: "bold", color: s.dark ? "#0b2545" : "#fff", border: `3px solid ${isBobby ? "#e8a838" : "#1e88c7"}`, flexShrink: 0 }}>
+                  {s.ini}
+                </div>
+              )}
+              <div>
+                <div style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: "bold", color: isBobby ? "#fff" : "#0b2545", marginBottom: 2 }}>{s.name}</div>
+                <div style={{ fontSize: 10, color: isBobby ? "#e8a838" : "#1e88c7", fontWeight: "bold", textTransform: "uppercase", marginBottom: 6 }}>{s.role}</div>
+                {sp.bio && <div style={{ ...small, color: isBobby ? "rgba(255,255,255,0.85)" : "#5a6a78", lineHeight: 1.6 }}>{sp.bio}</div>}
+                {sp.fun && <div style={{ fontSize: 11, color: "#e8a838", fontWeight: "bold", marginTop: 5 }}>⭐ {sp.fun}</div>}
+              </div>
+            </div>
+            <div style={{ textAlign: "center", marginTop: 10 }}>
+              <a href={BOOK_URL} target="_blank" rel="noreferrer"
+                style={{ display: "inline-block", background: isBobby ? "#e8a838" : "#1e88c7", color: isBobby ? "#0b2545" : "#fff", fontSize: 11, fontWeight: "bold", padding: "7px 18px", borderRadius: 18, textDecoration: "none" }}>
+                Book a Lesson with {s.name.split(" ")[0]}
+              </a>
+            </div>
+          </div>
+        );
+      })}
 
       {/* Triathlon */}
       {triOn && (
@@ -575,7 +612,7 @@ export default function EmailPreview({ opts, pvMode }) {
       )}
 
       {/* CTA */}
-      <div style={{ background: "#0b2545", padding: "22px 18px", textAlign: "center" }}>
+      {showFooterCta !== false && <div style={{ background: "#0b2545", padding: "22px 18px", textAlign: "center" }}>
         <p
           style={{
             fontFamily: "Georgia,serif",
@@ -610,7 +647,7 @@ export default function EmailPreview({ opts, pvMode }) {
         <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", margin: "12px 0 0" }}>
           {COACH_EMAIL}
         </p>
-      </div>
+      </div>}
 
       {/* Footer */}
       <div style={{ background: "#071a33", padding: "12px 18px", textAlign: "center" }}>

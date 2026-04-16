@@ -240,6 +240,52 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
 }
 
 /**
+ * Builds instructor spotlight HTML blocks.
+ * @param {string[]} instOrder
+ * @param {Object} insts
+ * @param {Object} spotlights - { [id]: { on, bio, fun } }
+ * @returns {string} HTML string (one block per active spotlight)
+ */
+export function buildSpotlightBlocks(instOrder, insts, spotlights) {
+  if (!spotlights) return "";
+  return instOrder
+    .filter((id) => insts[id] && spotlights[id]?.on)
+    .map((id) => {
+      const s   = insts[id];
+      const sp  = spotlights[id];
+      const isBobby = id === "bobby";
+      const bg  = isBobby ? "#0b2545" : "#f5f7f9";
+      const border = isBobby ? "none" : "1px solid #e8ecf0";
+      const nameColor  = isBobby ? "#fff" : "#0b2545";
+      const roleColor  = isBobby ? "#e8a838" : "#1e88c7";
+      const textColor  = isBobby ? "rgba(255,255,255,0.85)" : "#5a6a78";
+      const factColor  = isBobby ? "#e8a838" : "#e8a838";
+      const avatarBorder = isBobby ? "3px solid #e8a838" : "3px solid #1e88c7";
+      const avatarSize = 72;
+
+      const avatar = s.photo
+        ? `<img src="${EMAIL_IMAGE_BASE}/${s.photo}" alt="${s.name}" width="${avatarSize}" height="${avatarSize}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:${avatarBorder};display:block;flex-shrink:0;" />`
+        : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:${s.col};text-align:center;line-height:${avatarSize}px;font-size:20px;font-weight:bold;color:${s.dark ? "#0b2545" : "#fff"};border:${avatarBorder};flex-shrink:0;">${s.ini}</div>`;
+
+      return (
+        `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
+        `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Instructor Spotlight</p>` +
+        `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};border:${border};border-radius:12px;"><tr>` +
+        `<td width="${avatarSize + 24}" style="padding:16px 0 16px 16px;vertical-align:top;">${avatar}</td>` +
+        `<td style="padding:16px 12px 16px 4px;vertical-align:top;">` +
+        `<p style="font-family:Georgia,serif;font-size:15px;color:${nameColor};font-weight:bold;margin:0 0 2px;">${s.name}</p>` +
+        `<p style="font-size:10px;color:${roleColor};font-weight:bold;text-transform:uppercase;margin:0 0 8px;">${s.role}</p>` +
+        (sp.bio ? `<p style="font-size:12px;color:${textColor};line-height:1.6;margin:0 0 8px;">${sp.bio}</p>` : "") +
+        (sp.fun ? `<p style="font-size:11px;color:${factColor};font-weight:bold;margin:0;">⭐ ${sp.fun}</p>` : "") +
+        `</td></tr></table>` +
+        `<p style="text-align:center;margin:12px 0 0;"><a href="${BOOK_URL}" style="display:inline-block;background:${isBobby ? "#e8a838" : "#1e88c7"};color:${isBobby ? "#0b2545" : "#fff"};font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:8px 22px;border-radius:20px;">Book a Lesson with ${s.name.split(" ")[0]}</a></p>` +
+        `</td></tr>`
+      );
+    })
+    .join("");
+}
+
+/**
  * Builds the outdoor pool conditions HTML block.
  * @param {boolean} poolCondOn
  * @returns {string} HTML table row string, or "" if poolCondOn is false
@@ -288,7 +334,8 @@ export function buildEmailHtml(opts) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
-    poolCondOn,
+    poolCondOn, spotlights,
+    showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
   } = opts;
 
   const dr = startD && endD
@@ -335,23 +382,23 @@ img{max-width:100%;height:auto;display:block;}
 <td style="width:50%;vertical-align:top;">${b2}${b3}</td>
 </tr></table></td></tr>
 
-<tr><td style="background:#e8a838;padding:11px 20px;text-align:center;">
+${showBanner !== false ? `<tr><td style="background:#e8a838;padding:11px 20px;text-align:center;">
 <p style="font-family:Georgia,serif;font-size:14px;color:#fff;font-weight:bold;margin:0;">Non-Members Are Always Welcome!</p>
 <p style="font-size:11px;color:rgba(255,255,255,0.9);margin:3px 0 0;">No Cooper membership needed. Everyone is invited.</p>
-</td></tr>
+</td></tr>` : ""}
 
-${buildPoolBlock(poolType)}${buildPoolCondBlock(poolCondOn)}${buildWeatherBlock(forecast)}${buildInstructorBlock(instOrder, insts)}
+${showPoolLoc !== false ? buildPoolBlock(poolType) : ""}${buildPoolCondBlock(poolCondOn)}${showWeather !== false ? buildWeatherBlock(forecast) : ""}${showInstructors !== false ? buildInstructorBlock(instOrder, insts) : ""}${buildSpotlightBlocks(instOrder, insts, spotlights)}
 
-${buildRatesBlock()}
+${showRates !== false ? buildRatesBlock() : ""}
 
 ${buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice)}${buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra)}
 
-<tr><td class="pad" style="background:#0b2545;padding:26px 20px;text-align:center;">
+${showFooterCta !== false ? `<tr><td class="pad" style="background:#0b2545;padding:26px 20px;text-align:center;">
 <p style="font-family:Georgia,serif;font-size:20px;color:#fff;margin:0 0 6px;font-weight:bold;">Ready to Jump In?</p>
 <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 16px;">Spots fill up fast - book your lesson today!</p>
 <a href="${BOOK_URL}" style="display:inline-block;background:#e8a838;color:#0b2545;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 30px;border-radius:28px;">Book a Lesson</a>
 <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:14px 0 0;">Questions? Email <a href="mailto:${COACH_EMAIL}" style="color:#e8a838;">${COACH_EMAIL}</a></p>
-</td></tr>
+</td></tr>` : ""}
 <tr><td style="background:#071a33;padding:14px 20px;text-align:center;">
 <p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0 0 2px;">${FACILITY_ADDRESS}</p>
 <p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0;"><a href="https://cooperfitness.com" style="color:rgba(255,255,255,0.4);text-decoration:none;">cooperfitness.com</a></p>
