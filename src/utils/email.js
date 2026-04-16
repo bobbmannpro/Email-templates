@@ -1,6 +1,11 @@
 import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS, FORECAST_ZIP_LABEL, EMAIL_IMAGE_BASE } from "../config.js";
 import { fmtDate } from "./date.js";
 
+// Converts newlines to <br> tags so textarea line breaks appear in email HTML.
+function nl2br(str) {
+  return (str || "").replace(/\n/g, "<br>");
+}
+
 /**
  * Extracts initials from a full name (first + last initial).
  * @param {string} name - Full name
@@ -207,7 +212,7 @@ export function buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice)
     `<td width="60" valign="middle" style="text-align:right;"><img src="${EMAIL_IMAGE_BASE}/cfclogo.jpg" alt="Cooper Fitness Center" width="52" height="52" style="width:52px;height:52px;border-radius:8px;display:block;margin-left:auto;" /></td>` +
     `</tr></table>` +
     (triDate ? `<p style="font-size:12px;color:#e8a838;font-weight:bold;margin:0 0 10px;">📅 ${fmtDate(triDate)}</p>` : "") +
-    `<p style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;margin:0 0 14px;">${triDesc || "Train your swim leg with Coach Bobby."}</p>` +
+    `<p style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6;margin:0 0 14px;">${nl2br(triDesc || "Train your swim leg with Coach Bobby.")}</p>` +
     (triPrice ? `<p style="font-size:13px;color:#fff;font-weight:bold;margin:0 0 12px;">💰 ${triPrice}</p>` : "") +
     `<a href="${BOOK_URL}" style="display:inline-block;background:#e8a838;color:#0b2545;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:9px 22px;border-radius:20px;">Sign Up</a>` +
     `</td></tr></table></td></tr>`
@@ -232,8 +237,8 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
     `<p style="font-family:Georgia,serif;font-size:18px;color:#0b2545;font-weight:bold;margin:0;">${teamTitle || "Join the Cooper Cyclones!"}</p></td>` +
     `<td width="70" valign="middle" style="text-align:right;"><img src="${EMAIL_IMAGE_BASE}/cycloneslogo.png" alt="Cooper Cyclones" width="60" height="60" style="width:60px;height:60px;object-fit:contain;display:block;margin-left:auto;" /></td>` +
     `</tr></table>` +
-    `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 ${teamExtra ? "12px" : "14px"};">${teamDesc || "Year-round competitive swim team for youth athletes."}</p>` +
-    (teamExtra ? `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 14px;">${teamExtra}</p>` : "") +
+    `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 ${teamExtra ? "12px" : "14px"};">${nl2br(teamDesc || "Year-round competitive swim team for youth athletes.")}</p>` +
+    (teamExtra ? `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 14px;">${nl2br(teamExtra)}</p>` : "") +
     `<a href="mailto:${COACH_EMAIL}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:9px 22px;border-radius:20px;">Email Coach Bobby</a>` +
     `</td></tr></table></td></tr>`
   );
@@ -275,7 +280,7 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights) {
         `<td style="padding:16px 12px 16px 4px;vertical-align:top;">` +
         `<p style="font-family:Georgia,serif;font-size:15px;color:${nameColor};font-weight:bold;margin:0 0 2px;">${s.name}</p>` +
         `<p style="font-size:10px;color:${roleColor};font-weight:bold;text-transform:uppercase;margin:0 0 8px;">${s.role}</p>` +
-        (sp.bio ? `<p style="font-size:12px;color:${textColor};line-height:1.6;margin:0 0 8px;">${sp.bio}</p>` : "") +
+        (sp.bio ? `<p style="font-size:12px;color:${textColor};line-height:1.6;margin:0 0 8px;">${nl2br(sp.bio)}</p>` : "") +
         (sp.fun ? `<p style="font-size:11px;color:${factColor};font-weight:bold;margin:0;">⭐ ${sp.fun}</p>` : "") +
         `</td></tr></table>` +
         `<p style="text-align:center;margin:12px 0 0;"><a href="${BOOK_URL}" style="display:inline-block;background:${isBobby ? "#e8a838" : "#1e88c7"};color:${isBobby ? "#0b2545" : "#fff"};font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:8px 22px;border-radius:20px;">Book a Lesson with ${s.name.split(" ")[0]}</a></p>` +
@@ -377,7 +382,7 @@ img{max-width:100%;height:auto;display:block;}
 
 <tr><td class="pad" style="background:#f3f8fc;padding:20px;border-bottom:2px solid #1e88c7;">
 <p class="hh" style="font-family:Georgia,serif;font-size:22px;color:#0b2545;line-height:1.2;margin:0 0 8px;">${title || "Private Swim Lessons"}<br><em style="color:#1e88c7;font-weight:normal;">${dr}</em></p>
-<p style="font-size:13px;color:#5a6a78;line-height:1.6;margin:0 0 12px;">${subtitle}</p>
+<p style="font-size:13px;color:#5a6a78;line-height:1.6;margin:0 0 12px;">${nl2br(subtitle)}</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr>
 <td style="width:50%;padding-right:8px;vertical-align:top;">${b0}${b1}</td>
 <td style="width:50%;vertical-align:top;">${b2}${b3}</td>

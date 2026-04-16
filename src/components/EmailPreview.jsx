@@ -88,7 +88,7 @@ export default function EmailPreview({ opts, pvMode }) {
           <br />
           <em style={{ color: "#1e88c7", fontWeight: "normal" }}>{dr}</em>
         </p>
-        <p style={{ ...small, color: "#5a6a78", margin: "0 0 10px" }}>{subtitle}</p>
+        <p style={{ ...small, color: "#5a6a78", margin: "0 0 10px", whiteSpace: "pre-line" }}>{subtitle}</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 8px" }}>
           {bl.map((b, i) => (
             <p key={i} style={{ fontSize: 11, color: "#2a3642", margin: 0 }}>
@@ -503,7 +503,7 @@ export default function EmailPreview({ opts, pvMode }) {
               <div>
                 <div style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: "bold", color: isBobby ? "#fff" : "#0b2545", marginBottom: 2 }}>{s.name}</div>
                 <div style={{ fontSize: 10, color: isBobby ? "#e8a838" : "#1e88c7", fontWeight: "bold", textTransform: "uppercase", marginBottom: 6 }}>{s.role}</div>
-                {sp.bio && <div style={{ ...small, color: isBobby ? "rgba(255,255,255,0.85)" : "#5a6a78", lineHeight: 1.6 }}>{sp.bio}</div>}
+                {sp.bio && <div style={{ ...small, color: isBobby ? "rgba(255,255,255,0.85)" : "#5a6a78", lineHeight: 1.6, whiteSpace: "pre-line" }}>{sp.bio}</div>}
                 {sp.fun && <div style={{ fontSize: 11, color: "#e8a838", fontWeight: "bold", marginTop: 5 }}>⭐ {sp.fun}</div>}
               </div>
             </div>
@@ -537,7 +537,7 @@ export default function EmailPreview({ opts, pvMode }) {
                 📅 {fmtDate(triDate)}
               </p>
             )}
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: "0 0 10px" }}>
+            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: "0 0 10px", whiteSpace: "pre-line" }}>
               {triDesc}
             </p>
             {triPrice && (
@@ -589,9 +589,9 @@ export default function EmailPreview({ opts, pvMode }) {
               </div>
               <img src={`${import.meta.env.BASE_URL}photos/cycloneslogo.png`} alt="Cooper Cyclones" style={{ width: 54, height: 54, objectFit: "contain", flexShrink: 0, marginLeft: 10 }} />
             </div>
-            <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px" }}>{teamDesc}</p>
+            <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px", whiteSpace: "pre-line" }}>{teamDesc}</p>
             {teamExtra && (
-              <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px" }}>{teamExtra}</p>
+              <p style={{ fontSize: 11, color: "#5a6a78", lineHeight: 1.6, margin: "0 0 8px", whiteSpace: "pre-line" }}>{teamExtra}</p>
             )}
             <a
               href={`mailto:${COACH_EMAIL}`}
