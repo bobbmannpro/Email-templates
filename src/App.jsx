@@ -32,6 +32,8 @@ export default function App() {
   const [teamOn, setTeamOn]         = useState(false);
   const [poolCondOn, setPoolCondOn] = useState(false);
 
+  const [navTitle, setNavTitle] = useState("Swim Lessons at Cooper Fitness Center");
+
   // Per-section visibility (all on by default)
   const [showBanner,     setShowBanner]     = useState(true);
   const [showPoolLoc,    setShowPoolLoc]    = useState(true);
@@ -83,6 +85,7 @@ export default function App() {
       title: hTitle, subtitle: hSub, bullets: hBullets,
       triOn, triDate, triTitle, triDesc, triPrice,
       teamOn, teamTitle, teamDesc, teamExtra,
+      navTitle,
       poolCondOn, spotlights,
       showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
     };
@@ -345,26 +348,22 @@ export default function App() {
                 Toggle each section on or off. Sections with settings expand when turned on.
               </p>
 
-              {/* Helper to render a section row */}
+              {/* Section rows */}
               {[
-                { key: "header",       label: "Header & Logo",           locked: true },
-                { key: "hero",         label: "Headline & Subtitle",      locked: true },
-                { key: "banner",       label: "Non-Members Welcome Banner", on: showBanner,      set: setShowBanner },
-                { key: "poolLoc",      label: "Pool Location Info",       on: showPoolLoc,     set: setShowPoolLoc },
-                { key: "poolCond",     label: "Outdoor Pool Conditions",  on: poolCondOn,      set: setPoolCondOn },
-                { key: "weather",      label: "Weather Forecast",         on: showWeather,     set: setShowWeather },
-                { key: "instructors",  label: "Meet Your Instructors",    on: showInstructors, set: setShowInstructors },
-                { key: "spotlights",   label: "Instructor Spotlights",    on: Object.values(spotlights).some(s => s.on), custom: true },
-                { key: "rates",        label: "Lesson Rates",             on: showRates,       set: setShowRates },
-                { key: "triathlon",    label: "Triathlon Training",       on: triOn,           set: setTriOn },
-                { key: "cyclones",     label: "Cooper Cyclones",          on: teamOn,          set: setTeamOn },
-                { key: "footerCta",    label: "Footer Call-to-Action",    on: showFooterCta,   set: setShowFooterCta },
-              ].map(({ key, label, locked, on, set, custom }) => (
+                { key: "banner",      label: "Non-Members Welcome Banner", on: showBanner,      set: setShowBanner },
+                { key: "poolLoc",     label: "Pool Location Info",         on: showPoolLoc,     set: setShowPoolLoc },
+                { key: "poolCond",    label: "Outdoor Pool Conditions",    on: poolCondOn,      set: setPoolCondOn },
+                { key: "weather",     label: "Weather Forecast",           on: showWeather,     set: setShowWeather },
+                { key: "instructors", label: "Meet Your Instructors",      on: showInstructors, set: setShowInstructors },
+                { key: "spotlights",  label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on), custom: true },
+                { key: "rates",       label: "Lesson Rates",               on: showRates,       set: setShowRates },
+                { key: "triathlon",   label: "Triathlon Training",         on: triOn,           set: setTriOn },
+                { key: "cyclones",    label: "Cooper Cyclones",            on: teamOn,          set: setTeamOn },
+                { key: "footerCta",   label: "Footer Call-to-Action",      on: showFooterCta,   set: setShowFooterCta },
+              ].map(({ key, label, on, set, custom }) => (
                 <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f3f6" }}>
-                  <span style={{ fontSize: 13, color: locked ? "#b0bcc8" : NAVY, fontWeight: locked ? "normal" : "500" }}>{label}</span>
-                  {locked ? (
-                    <span style={{ fontSize: 10, color: "#b0bcc8", background: "#f0f3f6", padding: "2px 8px", borderRadius: 10 }}>Always On</span>
-                  ) : custom ? (
+                  <span style={{ fontSize: 13, color: NAVY, fontWeight: "500" }}>{label}</span>
+                  {custom ? (
                     <span style={{ fontSize: 10, color: BLUE }}>Configured below ↓</span>
                   ) : (
                     <button
@@ -384,6 +383,51 @@ export default function App() {
                   )}
                 </div>
               ))}
+            </Card>
+
+            {/* ── Header & Logo ── */}
+            <Card>
+              <SLabel text="Header & Logo" />
+              <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Nav Bar Title</label>
+              <input
+                value={navTitle}
+                onChange={(e) => setNavTitle(e.target.value)}
+                style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 13, fontWeight: "bold", color: NAVY, boxSizing: "border-box" }}
+              />
+            </Card>
+
+            {/* ── Headline & Subtitle ── */}
+            <Card>
+              <SLabel text="Headline & Subtitle" />
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Headline</label>
+                <input
+                  value={hTitle}
+                  onChange={(e) => setHTitle(e.target.value)}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 14, fontWeight: "bold", color: NAVY, boxSizing: "border-box" }}
+                />
+              </div>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Subtitle</label>
+                <textarea
+                  value={hSub}
+                  onChange={(e) => setHSub(e.target.value)}
+                  rows={2}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
+                />
+              </div>
+              <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 6 }}>Bullet Points</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                {hBullets.map((b, i) => (
+                  <input
+                    key={i}
+                    value={b}
+                    onChange={(e) => { const next = [...hBullets]; next[i] = e.target.value; setHBullets(next); }}
+                    placeholder={"Benefit " + (i + 1)}
+                    style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                ))}
+              </div>
             </Card>
 
             {/* ── Pool Conditions config ── */}

@@ -8,6 +8,7 @@ export default function EmailPreview({ opts, pvMode }) {
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
     poolCondOn, spotlights,
+    navTitle,
     showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
   } = opts;
 
@@ -61,7 +62,7 @@ export default function EmailPreview({ opts, pvMode }) {
             fontWeight: "bold",
           }}
         >
-          Swim Lessons at Cooper Fitness Center
+          {navTitle || "Swim Lessons at Cooper Fitness Center"}
         </span>
       </div>
 

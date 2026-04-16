@@ -335,6 +335,7 @@ export function buildEmailHtml(opts) {
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
     poolCondOn, spotlights,
+    navTitle,
     showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
   } = opts;
 
@@ -371,7 +372,7 @@ img{max-width:100%;height:auto;display:block;}
 <tr><td class="pad" style="background:#0b2545;padding:16px 20px;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 <td width="56" valign="middle"><img src="${EMAIL_IMAGE_BASE}/cfclogo.jpg" alt="Cooper Fitness Center" width="48" height="48" style="width:48px;height:48px;border-radius:6px;display:block;" /></td>
-<td style="padding-left:12px;" valign="middle"><span class="nav-title" style="font-family:Georgia,serif;font-size:15px;color:#fff;font-weight:bold;word-break:break-word;">Swim Lessons at Cooper Fitness Center</span></td>
+<td style="padding-left:12px;" valign="middle"><span class="nav-title" style="font-family:Georgia,serif;font-size:15px;color:#fff;font-weight:bold;word-break:break-word;">${navTitle || "Swim Lessons at Cooper Fitness Center"}</span></td>
 </tr></table></td></tr>
 
 <tr><td class="pad" style="background:#f3f8fc;padding:20px;border-bottom:2px solid #1e88c7;">
