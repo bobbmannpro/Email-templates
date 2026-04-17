@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NAVY, BLUE, GOLD, GRN } from "./config.js";
+import SocialGenerator from "./components/SocialGenerator.jsx";
 import { fmtDate } from "./utils/date.js";
 import { buildEmailHtml } from "./utils/email.js";
 import { useInstructors } from "./hooks/useInstructors.js";
@@ -13,6 +14,9 @@ import HeaderEditor from "./components/HeaderEditor.jsx";
 import PreviewPanel from "./components/PreviewPanel.jsx";
 
 export default function App() {
+  // ─── App mode ────────────────────────────────────────────────────────────────
+  const [appMode, setAppMode] = useState("email"); // "email" | "social"
+
   // ─── App-level state ─────────────────────────────────────────────────────────
   const [step, setStep]     = useState(1);
   const [poolType, setPoolType] = useState("hotel");
@@ -119,10 +123,37 @@ export default function App() {
         >
           CFC
         </div>
-        <div style={{ color: "#fff", fontSize: 15, fontWeight: "bold", fontFamily: "Georgia,serif" }}>
-          Cooper Swim Email Generator
+        <div style={{ color: "#fff", fontSize: 15, fontWeight: "bold", fontFamily: "Georgia,serif", flex: 1 }}>
+          Cooper Swim Tools
+        </div>
+        {/* Mode toggle */}
+        <div style={{ display: "flex", gap: 6 }}>
+          {[["email", "✉ Email"], ["social", "📸 Social"]].map(([mode, label]) => (
+            <button
+              key={mode}
+              onClick={() => setAppMode(mode)}
+              style={{
+                padding: "6px 14px",
+                borderRadius: 20,
+                border: `2px solid ${appMode === mode ? GOLD : "rgba(255,255,255,0.25)"}`,
+                background: appMode === mode ? GOLD : "transparent",
+                color: appMode === mode ? NAVY : "rgba(255,255,255,0.85)",
+                fontWeight: "bold",
+                fontSize: 12,
+                cursor: "pointer",
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Social generator mode */}
+      {appMode === "social" && <SocialGenerator />}
+
+      {/* Email generator mode */}
+      {appMode !== "social" && <>
 
       {/* Step tabs */}
       <div style={{ background: "#fff", borderBottom: "1px solid #e8ecf0", display: "flex", padding: "0 8px", overflowX: "auto" }}>
@@ -585,6 +616,8 @@ export default function App() {
         )}
 
       </div>
+
+      </>} {/* end email mode */}
     </div>
   );
 }
