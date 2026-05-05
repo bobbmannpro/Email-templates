@@ -91,6 +91,23 @@ export default function App() {
   }
   function onDragEnd() { dragSrcRef.current = null; }
 
+  // ─── Instructor / spotlight drag-and-drop ─────────────────────────────────────
+  const instDragRef = useRef(null);
+  function onInstDragStart(idx) { instDragRef.current = idx; }
+  function onInstDragOver(e, idx) {
+    e.preventDefault();
+    if (instDragRef.current === null || instDragRef.current === idx) return;
+    const src = instDragRef.current;
+    setInstOrder(prev => {
+      const ord = [...prev];
+      const [removed] = ord.splice(src, 1);
+      ord.splice(idx, 0, removed);
+      instDragRef.current = idx;
+      return ord;
+    });
+  }
+  function onInstDragEnd() { instDragRef.current = null; }
+
   // ─── Reset all settings ───────────────────────────────────────────────────────
   function resetAll() {
     if (!confirm("Reset all email settings to defaults?")) return;
@@ -108,7 +125,7 @@ export default function App() {
   const weather     = useWeather(startD, endD);
   const header      = useHeaderForm();
 
-  const { instOrder, insts, addOpen, setAddOpen, newName, setNewName, newRole, setNewRole,
+  const { instOrder, setInstOrder, insts, addOpen, setAddOpen, newName, setNewName, newRole, setNewRole,
           newAvail, setNewAvail, newAges, setNewAges, newBadge, setNewBadge,
           nameError, setNameError, togInst, updInst, addInst, removeInst } = instructors;
 
@@ -409,7 +426,7 @@ export default function App() {
                 </button>
               </div>
               <p style={{ margin: "0 0 12px", fontSize: 12, color: "#9aa8b5" }}>
-                Check to include. Edit any field — preview updates live.
+                Check to include. Edit any field — preview updates live. Drag ⠿ to reorder.
               </p>
 
               <AddInstructorModal
@@ -423,18 +440,31 @@ export default function App() {
                 addInst={addInst}
               />
 
-              {instOrder.map((id) => {
+              {instOrder.map((id, idx) => {
                 const st = insts[id];
                 if (!st) return null;
                 return (
-                  <InstructorCard
+                  <div
                     key={id}
-                    id={id}
-                    st={st}
-                    togInst={togInst}
-                    updInst={updInst}
-                    removeInst={removeInst}
-                  />
+                    onDragOver={(e) => onInstDragOver(e, idx)}
+                    style={{ display: "flex", alignItems: "flex-start", gap: 4 }}
+                  >
+                    <span
+                      draggable
+                      onDragStart={() => onInstDragStart(idx)}
+                      onDragEnd={onInstDragEnd}
+                      style={{ color: "#c0c8d0", fontSize: 18, paddingTop: 13, cursor: "grab", userSelect: "none", flexShrink: 0, lineHeight: 1 }}
+                    >⠿</span>
+                    <div style={{ flex: 1 }}>
+                      <InstructorCard
+                        id={id}
+                        st={st}
+                        togInst={togInst}
+                        updInst={updInst}
+                        removeInst={removeInst}
+                      />
+                    </div>
+                  </div>
                 );
               })}
             </Card>
@@ -569,12 +599,23 @@ export default function App() {
             )}
 
             {/* ── Instructor Spotlights config ── */}
-            {instOrder.map((id) => {
+            {instOrder.map((id, idx) => {
               const inst = insts[id];
               if (!inst) return null;
               const spot = spotlights[id] || { on: false, bio: "", fun: "" };
               return (
-                <Card key={id}>
+                <div
+                  key={id}
+                  onDragOver={(e) => onInstDragOver(e, idx)}
+                  style={{ display: "flex", alignItems: "flex-start", gap: 4 }}
+                >
+                  <span
+                    draggable
+                    onDragStart={() => onInstDragStart(idx)}
+                    onDragEnd={onInstDragEnd}
+                    style={{ color: "#c0c8d0", fontSize: 18, paddingTop: 14, cursor: "grab", userSelect: "none", flexShrink: 0, lineHeight: 1 }}
+                  >⠿</span>
+                <Card style={{ flex: 1 }}>
                   <ToggleRow
                     on={spot.on}
                     onToggle={() => toggleSpotlight(id)}
@@ -621,6 +662,7 @@ export default function App() {
                     </>
                   )}
                 </Card>
+                </div>
               );
             })}
 
