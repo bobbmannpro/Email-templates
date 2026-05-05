@@ -1,6 +1,10 @@
 import { NAVY, BLUE, GOLD } from "../config.js";
 import { FI } from "./ui.jsx";
 
+function badgeColors(badge, bb, bc) {
+  return /\bavailable\b/i.test(badge || "") ? { bb: "#e6f5ee", bc: "#1a8a5c" } : { bb, bc };
+}
+
 export default function InstructorCard({ id, st, togInst, updInst, removeInst }) {
   return (
     <div
@@ -185,19 +189,11 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
                   📅 {st.avail} · 🏊 {st.ages}
                 </div>
                 <div style={{ marginTop: 4 }}>
-                  <span
-                    style={{
-                      background: st.bb,
-                      color: st.bc,
-                      fontSize: 9,
-                      fontWeight: "bold",
-                      padding: "2px 8px",
-                      borderRadius: 10,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {st.badge}
-                  </span>
+                  {(() => { const bc = badgeColors(st.badge, st.bb, st.bc); return (
+                    <span style={{ background: bc.bb, color: bc.bc, fontSize: 9, fontWeight: "bold", padding: "2px 8px", borderRadius: 10, textTransform: "uppercase" }}>
+                      {st.badge}
+                    </span>
+                  ); })()}
                 </div>
               </div>
             )}

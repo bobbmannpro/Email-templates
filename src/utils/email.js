@@ -1,27 +1,21 @@
 import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS, FORECAST_ZIP_LABEL, EMAIL_IMAGE_BASE } from "../config.js";
 import { fmtDate } from "./date.js";
 
-// Converts newlines to <br> tags so textarea line breaks appear in email HTML.
 function nl2br(str) {
   return (str || "").replace(/\n/g, "<br>");
 }
 
-/**
- * Extracts initials from a full name (first + last initial).
- * @param {string} name - Full name
- * @returns {string} Up to 2 uppercase initials
- */
+// Returns green colors when badge text contains "available", otherwise uses stored colors.
+function badgeColors(badge, bb, bc) {
+  return /\bavailable\b/i.test(badge || "") ? { bb: "#e6f5ee", bc: "#1a8a5c" } : { bb, bc };
+}
+
 export function initials(name) {
   const parts = name.trim().split(" ").filter(Boolean);
   if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   return name.slice(0, 2).toUpperCase();
 }
 
-/**
- * Builds the pool location HTML block.
- * @param {string} poolType - "hotel" or "fitness"
- * @returns {string} HTML table row string
- */
 export function buildPoolBlock(poolType) {
   if (poolType === "hotel") {
     return `
@@ -47,11 +41,6 @@ export function buildPoolBlock(poolType) {
 </td></tr></table></td></tr>`;
 }
 
-/**
- * Builds the weather forecast HTML block.
- * @param {Array<{day:string,icon:string,high:string,low:string,rain:string}>|null} forecast
- * @returns {string} HTML table row string, or "" if no forecast
- */
 export function buildWeatherBlock(forecast) {
   if (!forecast || forecast.length === 0) return "";
   const cells = forecast
@@ -74,12 +63,6 @@ export function buildWeatherBlock(forecast) {
   );
 }
 
-/**
- * Builds the instructors HTML block.
- * @param {string[]} instOrder - Ordered array of instructor IDs
- * @param {Object} insts - Map of instructor ID → instructor state object
- * @returns {string} HTML table row string, or "" if no instructors selected
- */
 export function buildInstructorBlock(instOrder, insts) {
   const selIds   = instOrder.filter((id) => insts[id] && insts[id].sel);
   const hasBobby = selIds.includes("bobby");
@@ -115,6 +98,7 @@ export function buildInstructorBlock(instOrder, insts) {
     .map((id) => {
       const s = insts[id];
       const w = n <= 2 ? Math.floor(100 / n) + "%" : "130px";
+      const bc = badgeColors(s.badge, s.bb, s.bc);
       return (
         `<td style="width:${w};min-width:${n > 2 ? "130px" : "0"};padding:0 4px;vertical-align:top;">` +
         `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;">` +
@@ -126,7 +110,7 @@ export function buildInstructorBlock(instOrder, insts) {
         `<p style="font-size:10px;color:#1e88c7;font-weight:bold;margin:0 0 8px;">${s.role}</p>` +
         `<p style="font-size:10px;color:#5a6a78;margin:0 0 2px;">📅 ${s.avail}</p>` +
         `<p style="font-size:10px;color:#5a6a78;margin:0 0 8px;">🏊 ${s.ages}</p>` +
-        `<span style="display:inline-block;font-size:9px;font-weight:bold;text-transform:uppercase;padding:3px 8px;border-radius:12px;background:${s.bb};color:${s.bc};margin-bottom:10px;">${s.badge}</span><br>` +
+        `<span style="display:inline-block;font-size:9px;font-weight:bold;text-transform:uppercase;padding:3px 8px;border-radius:12px;background:${bc.bb};color:${bc.bc};margin-bottom:10px;">${s.badge}</span><br>` +
         `<a href="${BOOK_URL}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-decoration:none;padding:7px 16px;border-radius:18px;">Book</a>` +
         `</td></tr></table></td>`
       );
@@ -147,10 +131,6 @@ export function buildInstructorBlock(instOrder, insts) {
   );
 }
 
-/**
- * Builds the lesson rates HTML block. Rates are static — no parameters needed.
- * @returns {string} HTML table row string
- */
 export function buildRatesBlock() {
   return `
 <tr><td class="pad" style="padding:20px;border-bottom:1px solid #e8ecf0;">
@@ -192,15 +172,6 @@ export function buildRatesBlock() {
 </td></tr>`;
 }
 
-/**
- * Builds the triathlon training HTML block.
- * @param {boolean} triOn
- * @param {string} triDate - ISO date string or ""
- * @param {string} triTitle
- * @param {string} triDesc
- * @param {string} triPrice
- * @returns {string} HTML table row string, or "" if triOn is false
- */
 export function buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice) {
   if (!triOn) return "";
   return (
@@ -219,14 +190,6 @@ export function buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice)
   );
 }
 
-/**
- * Builds the Cooper Cyclones swim team HTML block.
- * @param {boolean} teamOn
- * @param {string} teamTitle
- * @param {string} teamDesc
- * @param {string} teamExtra - Additional details, or ""
- * @returns {string} HTML table row string, or "" if teamOn is false
- */
 export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
   if (!teamOn) return "";
   return (
@@ -244,13 +207,6 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
   );
 }
 
-/**
- * Builds instructor spotlight HTML blocks.
- * @param {string[]} instOrder
- * @param {Object} insts
- * @param {Object} spotlights - { [id]: { on, bio, fun } }
- * @returns {string} HTML string (one block per active spotlight)
- */
 export function buildSpotlightBlocks(instOrder, insts, spotlights) {
   if (!spotlights) return "";
   return instOrder
@@ -264,7 +220,7 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights) {
       const nameColor  = isBobby ? "#fff" : "#0b2545";
       const roleColor  = isBobby ? "#e8a838" : "#1e88c7";
       const textColor  = isBobby ? "rgba(255,255,255,0.85)" : "#5a6a78";
-      const factColor  = isBobby ? "#e8a838" : "#e8a838";
+      const factColor  = "#e8a838";
       const avatarBorder = isBobby ? "3px solid #e8a838" : "3px solid #1e88c7";
       const avatarSize = 72;
 
@@ -290,11 +246,6 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights) {
     .join("");
 }
 
-/**
- * Builds the outdoor pool conditions HTML block.
- * @param {boolean} poolCondOn
- * @returns {string} HTML table row string, or "" if poolCondOn is false
- */
 export function buildPoolCondBlock(poolCondOn) {
   if (!poolCondOn) return "";
   return (
@@ -310,29 +261,29 @@ export function buildPoolCondBlock(poolCondOn) {
   );
 }
 
-/**
- * Builds the complete HTML email string.
- * @param {Object} opts - All email options
- * @param {string} opts.poolType
- * @param {string} opts.startD
- * @param {string} opts.endD
- * @param {Array|null} opts.forecast
- * @param {string[]} opts.instOrder
- * @param {Object} opts.insts
- * @param {string} opts.title
- * @param {string} opts.subtitle
- * @param {string[]} opts.bullets
- * @param {boolean} opts.triOn
- * @param {string} opts.triDate
- * @param {string} opts.triTitle
- * @param {string} opts.triDesc
- * @param {string} opts.triPrice
- * @param {boolean} opts.teamOn
- * @param {string} opts.teamTitle
- * @param {string} opts.teamDesc
- * @param {string} opts.teamExtra
- * @returns {string} Full DOCTYPE HTML string
- */
+export function buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption) {
+  if (!videoOn) return "";
+  const posterAttr = videoPoster ? ` poster="${videoPoster}"` : "";
+  const captionHtml = videoCaption
+    ? `<p style="font-size:12px;color:#5a6a78;text-align:center;margin:10px 0 0;">${videoCaption}</p>`
+    : "";
+  const fallback = videoPoster
+    ? `<a href="${videoUrl}" style="display:block;"><img src="${videoPoster}" width="520" alt="Watch video" style="max-width:100%;border-radius:10px;display:block;margin:0 auto;" /></a>`
+    : `<p style="text-align:center;margin:12px 0 0;"><a href="${videoUrl}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:10px 24px;border-radius:24px;">&#9654; Watch Video</a></p>`;
+
+  const inner = videoUrl
+    ? `<video controls${posterAttr} style="width:100%;max-width:520px;border-radius:10px;display:block;margin:0 auto;"><source src="${videoUrl}" type="video/mp4">${fallback}</video>`
+    : `<div style="padding:24px;background:#f5f7f9;border-radius:10px;text-align:center;font-size:12px;color:#9aa8b5;">Add a hosted video URL to embed in the email.</div>`;
+
+  return (
+    `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
+    `<div style="max-width:520px;margin:0 auto;">${inner}${captionHtml}</div>` +
+    `</td></tr>`
+  );
+}
+
+export const SECTION_KEYS = ["banner","poolLoc","poolCond","weather","instructors","spotlights","rates","video","triathlon","cyclones","footerCta"];
+
 export function buildEmailHtml(opts) {
   const {
     poolType, startD, endD, forecast, instOrder, insts,
@@ -342,6 +293,8 @@ export function buildEmailHtml(opts) {
     poolCondOn, spotlights,
     navTitle,
     showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+    videoOn, videoUrl, videoPoster, videoCaption,
+    sectionOrder,
   } = opts;
 
   const dr = startD && endD
@@ -356,6 +309,27 @@ export function buildEmailHtml(opts) {
   const b2 = bl[2] ? `<p style="font-size:12px;color:#2a3642;margin:0 0 4px;">&#10003; ${bl[2]}</p>` : "";
   const b3 = bl[3] ? `<p style="font-size:12px;color:#2a3642;margin:0;">&#10003; ${bl[3]}</p>` : "";
 
+  const sectionBuilders = {
+    banner:      () => showBanner !== false
+      ? `<tr><td style="background:#e8a838;padding:11px 20px;text-align:center;"><p style="font-family:Georgia,serif;font-size:14px;color:#fff;font-weight:bold;margin:0;">Non-Members Are Always Welcome!</p><p style="font-size:11px;color:rgba(255,255,255,0.9);margin:3px 0 0;">No Cooper membership needed. Everyone is invited.</p></td></tr>`
+      : "",
+    poolLoc:     () => showPoolLoc !== false ? buildPoolBlock(poolType) : "",
+    poolCond:    () => buildPoolCondBlock(poolCondOn),
+    weather:     () => showWeather !== false ? buildWeatherBlock(forecast) : "",
+    instructors: () => showInstructors !== false ? buildInstructorBlock(instOrder, insts) : "",
+    spotlights:  () => buildSpotlightBlocks(instOrder, insts, spotlights),
+    rates:       () => showRates !== false ? buildRatesBlock() : "",
+    video:       () => buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption),
+    triathlon:   () => buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice),
+    cyclones:    () => buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra),
+    footerCta:   () => showFooterCta !== false
+      ? `<tr><td class="pad" style="background:#0b2545;padding:26px 20px;text-align:center;"><p style="font-family:Georgia,serif;font-size:20px;color:#fff;margin:0 0 6px;font-weight:bold;">Ready to Jump In?</p><p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 16px;">Spots fill up fast - book your lesson today!</p><a href="${BOOK_URL}" style="display:inline-block;background:#e8a838;color:#0b2545;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 30px;border-radius:28px;">Book a Lesson</a><p style="font-size:12px;color:rgba(255,255,255,0.5);margin:14px 0 0;">Questions? Email <a href="mailto:${COACH_EMAIL}" style="color:#e8a838;">${COACH_EMAIL}</a></p></td></tr>`
+      : "",
+  };
+
+  const order = sectionOrder && sectionOrder.length > 0 ? sectionOrder : SECTION_KEYS;
+  const middleSections = order.map(k => sectionBuilders[k] ? sectionBuilders[k]() : "").join("\n");
+
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -365,6 +339,7 @@ table,td{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;}
 body{margin:0;padding:0;background:#e8ecf0;font-family:Arial,Helvetica,sans-serif;width:100%!important;min-width:100%!important;}
 p,td,span,a,div{word-break:break-word;overflow-wrap:break-word;}
 img{max-width:100%;height:auto;display:block;}
+video{max-width:100%;display:block;}
 .con{width:100%!important;max-width:600px!important;}
 .scroll-x{overflow-x:auto!important;-webkit-overflow-scrolling:touch;max-width:100%!important;display:block!important;}
 @media screen and (max-width:600px){.con{width:100%!important;}.pad{padding:14px 12px!important;}.hh{font-size:19px!important;}}
@@ -388,23 +363,8 @@ img{max-width:100%;height:auto;display:block;}
 <td style="width:50%;vertical-align:top;">${b2}${b3}</td>
 </tr></table></td></tr>
 
-${showBanner !== false ? `<tr><td style="background:#e8a838;padding:11px 20px;text-align:center;">
-<p style="font-family:Georgia,serif;font-size:14px;color:#fff;font-weight:bold;margin:0;">Non-Members Are Always Welcome!</p>
-<p style="font-size:11px;color:rgba(255,255,255,0.9);margin:3px 0 0;">No Cooper membership needed. Everyone is invited.</p>
-</td></tr>` : ""}
+${middleSections}
 
-${showPoolLoc !== false ? buildPoolBlock(poolType) : ""}${buildPoolCondBlock(poolCondOn)}${showWeather !== false ? buildWeatherBlock(forecast) : ""}${showInstructors !== false ? buildInstructorBlock(instOrder, insts) : ""}${buildSpotlightBlocks(instOrder, insts, spotlights)}
-
-${showRates !== false ? buildRatesBlock() : ""}
-
-${buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice)}${buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra)}
-
-${showFooterCta !== false ? `<tr><td class="pad" style="background:#0b2545;padding:26px 20px;text-align:center;">
-<p style="font-family:Georgia,serif;font-size:20px;color:#fff;margin:0 0 6px;font-weight:bold;">Ready to Jump In?</p>
-<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 16px;">Spots fill up fast - book your lesson today!</p>
-<a href="${BOOK_URL}" style="display:inline-block;background:#e8a838;color:#0b2545;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 30px;border-radius:28px;">Book a Lesson</a>
-<p style="font-size:12px;color:rgba(255,255,255,0.5);margin:14px 0 0;">Questions? Email <a href="mailto:${COACH_EMAIL}" style="color:#e8a838;">${COACH_EMAIL}</a></p>
-</td></tr>` : ""}
 <tr><td style="background:#071a33;padding:14px 20px;text-align:center;">
 <p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0 0 2px;">${FACILITY_ADDRESS}</p>
 <p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0;"><a href="https://cooperfitness.com" style="color:rgba(255,255,255,0.4);text-decoration:none;">cooperfitness.com</a></p>

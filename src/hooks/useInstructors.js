@@ -1,11 +1,8 @@
 import { useState } from "react";
+import { useLocalStorage } from "./useLocalStorage.js";
 import { SEED, COLORS } from "../config.js";
 import { initials } from "../utils/email.js";
 
-/**
- * Builds the initial instructor state map from SEED data.
- * @returns {Object} Map of instructor ID → instructor state object
- */
 export function buildInitialInsts() {
   const result = {};
   for (const s of SEED) {
@@ -29,13 +26,9 @@ export function buildInitialInsts() {
   return result;
 }
 
-/**
- * Custom hook for managing the instructor roster state and actions.
- * @returns {Object} Instructor state, setters, and action handlers
- */
 export function useInstructors() {
-  const [instOrder, setInstOrder] = useState(SEED.map((s) => s.id));
-  const [insts, setInsts]         = useState(buildInitialInsts());
+  const [instOrder, setInstOrder] = useLocalStorage("cfc_instOrder", SEED.map((s) => s.id));
+  const [insts, setInsts]         = useLocalStorage("cfc_insts", buildInitialInsts());
   const [addOpen, setAddOpen]     = useState(false);
   const [newName, setNewName]     = useState("");
   const [newRole, setNewRole]     = useState("Swim Instructor");
@@ -44,28 +37,14 @@ export function useInstructors() {
   const [newBadge, setNewBadge]   = useState("");
   const [nameError, setNameError] = useState("");
 
-  /**
-   * Toggles an instructor's selected state.
-   * @param {string} id - Instructor ID
-   */
   function togInst(id) {
     setInsts((prev) => ({ ...prev, [id]: { ...prev[id], sel: !prev[id].sel } }));
   }
 
-  /**
-   * Updates a single field on an instructor.
-   * @param {string} id - Instructor ID
-   * @param {string} key - Field name
-   * @param {*} val - New value
-   */
   function updInst(id, key, val) {
     setInsts((prev) => ({ ...prev, [id]: { ...prev[id], [key]: val } }));
   }
 
-  /**
-   * Adds a new custom instructor to the roster.
-   * Sets nameError if the name is blank or a duplicate.
-   */
   function addInst() {
     if (!newName.trim()) return;
     const isDuplicate = Object.values(insts).some(
@@ -106,10 +85,6 @@ export function useInstructors() {
     setAddOpen(false);
   }
 
-  /**
-   * Removes a custom instructor from the roster.
-   * @param {string} id - Instructor ID
-   */
   function removeInst(id) {
     setInstOrder((prev) => prev.filter((x) => x !== id));
     setInsts((prev) => {

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { NAVY, BLUE, GOLD, GRN } from "./config.js";
+import { useLocalStorage } from "./hooks/useLocalStorage.js";
 import SocialGenerator from "./components/SocialGenerator.jsx";
 import { fmtDate } from "./utils/date.js";
-import { buildEmailHtml } from "./utils/email.js";
+import { buildEmailHtml, SECTION_KEYS } from "./utils/email.js";
 import { useInstructors } from "./hooks/useInstructors.js";
 import { useWeather } from "./hooks/useWeather.js";
 import { useHeaderForm } from "./hooks/useHeaderForm.js";
@@ -15,52 +16,92 @@ import PreviewPanel from "./components/PreviewPanel.jsx";
 
 export default function App() {
   // ─── App mode ────────────────────────────────────────────────────────────────
-  const [appMode, setAppMode] = useState("email"); // "email" | "social"
+  const [appMode, setAppMode] = useState("email");
 
-  // ─── App-level state ─────────────────────────────────────────────────────────
-  const [step, setStep]     = useState(1);
-  const [poolType, setPoolType] = useState("hotel");
-  const [startD, setStartD] = useState("");
-  const [endD, setEndD]     = useState("");
-  const [pvMode, setPvMode] = useState("mobile");
-  const [copied, setCopied] = useState(false);
+  // ─── UI-only state (not persisted) ───────────────────────────────────────────
+  const [step, setStep]           = useState(1);
+  const [pvMode, setPvMode]       = useState("mobile");
+  const [copied, setCopied]       = useState(false);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState(""); // blob URL, not persisted
 
-  // Add-ons
-  const [triOn, setTriOn]       = useState(false);
-  const [triDate, setTriDate]   = useState("");
-  const [triTitle, setTriTitle] = useState("Triathlon Swim Training");
-  const [triDesc, setTriDesc]   = useState(
+  // ─── Persisted app state ─────────────────────────────────────────────────────
+  const [poolType, setPoolType]   = useLocalStorage("cfc_poolType", "hotel");
+  const [startD, setStartD]       = useLocalStorage("cfc_startD", "");
+  const [endD, setEndD]           = useLocalStorage("cfc_endD", "");
+
+  const [triOn, setTriOn]         = useLocalStorage("cfc_triOn", false);
+  const [triDate, setTriDate]     = useLocalStorage("cfc_triDate", "");
+  const [triTitle, setTriTitle]   = useLocalStorage("cfc_triTitle", "Triathlon Swim Training");
+  const [triDesc, setTriDesc]     = useLocalStorage("cfc_triDesc",
     "Train your swim leg with Coach Bobby - personalized sessions for sprint, Olympic, and 70.3 distances."
   );
-  const [triPrice, setTriPrice] = useState("$120/hour");
-  const [teamOn, setTeamOn]         = useState(false);
-  const [poolCondOn, setPoolCondOn] = useState(false);
+  const [triPrice, setTriPrice]   = useLocalStorage("cfc_triPrice", "$120/hour");
+  const [teamOn, setTeamOn]       = useLocalStorage("cfc_teamOn", false);
+  const [poolCondOn, setPoolCondOn] = useLocalStorage("cfc_poolCondOn", false);
 
-  const [navTitle, setNavTitle] = useState("Swim Lessons at Cooper Fitness Center");
+  const [navTitle, setNavTitle]   = useLocalStorage("cfc_navTitle", "Swim Lessons at Cooper Fitness Center");
 
-  // Per-section visibility (all on by default)
-  const [showBanner,     setShowBanner]     = useState(true);
-  const [showPoolLoc,    setShowPoolLoc]    = useState(true);
-  const [showWeather,    setShowWeather]    = useState(true);
-  const [showInstructors,setShowInstructors]= useState(true);
-  const [showRates,      setShowRates]      = useState(true);
-  const [showFooterCta,  setShowFooterCta]  = useState(true);
-  const [spotlights, setSpotlights] = useState({});   // { [id]: { on, bio, fun } }
+  const [showBanner,      setShowBanner]      = useLocalStorage("cfc_showBanner", true);
+  const [showPoolLoc,     setShowPoolLoc]      = useLocalStorage("cfc_showPoolLoc", true);
+  const [showWeather,     setShowWeather]      = useLocalStorage("cfc_showWeather", true);
+  const [showInstructors, setShowInstructors]  = useLocalStorage("cfc_showInstructors", true);
+  const [showRates,       setShowRates]        = useLocalStorage("cfc_showRates", true);
+  const [showFooterCta,   setShowFooterCta]    = useLocalStorage("cfc_showFooterCta", true);
+  const [spotlights, setSpotlights]            = useLocalStorage("cfc_spotlights", {});
 
-  function toggleSpotlight(id) {
-    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), on: !prev[id]?.on } }));
-  }
-  function updateSpotlight(id, key, val) {
-    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), [key]: val } }));
-  }
-  function defaultSpot(existing) {
-    return { on: false, bio: "", fun: "", ...existing };
-  }
-  const [teamTitle, setTeamTitle] = useState("Join the Cooper Cyclones!");
-  const [teamDesc, setTeamDesc]   = useState(
+  const [teamTitle, setTeamTitle] = useLocalStorage("cfc_teamTitle", "Join the Cooper Cyclones!");
+  const [teamDesc, setTeamDesc]   = useLocalStorage("cfc_teamDesc",
     "Year-round competitive swim team for youth athletes of all levels. USA Swimming sanctioned meets, structured training, and an incredible team culture."
   );
-  const [teamExtra, setTeamExtra] = useState("");
+  const [teamExtra, setTeamExtra] = useLocalStorage("cfc_teamExtra", "");
+
+  // ─── Video section ───────────────────────────────────────────────────────────
+  const [videoOn, setVideoOn]         = useLocalStorage("cfc_videoOn", false);
+  const [videoUrl, setVideoUrl]       = useLocalStorage("cfc_videoUrl", "");
+  const [videoPoster, setVideoPoster] = useLocalStorage("cfc_videoPoster", "");
+  const [videoCaption, setVideoCaption] = useLocalStorage("cfc_videoCaption", "");
+
+  // ─── Section order (drag-and-drop) ───────────────────────────────────────────
+  const [savedOrder, setSavedOrder] = useLocalStorage("cfc_sectionOrder", SECTION_KEYS);
+  // Ensure any newly-added keys are appended to existing saved order
+  const sectionOrder = [
+    ...savedOrder.filter(k => SECTION_KEYS.includes(k)),
+    ...SECTION_KEYS.filter(k => !savedOrder.includes(k)),
+  ];
+  const dragSrcRef = useRef(null);
+
+  function onDragStart(e, idx) {
+    dragSrcRef.current = idx;
+    e.dataTransfer.effectAllowed = "move";
+  }
+  function onDragOver(e, idx) {
+    e.preventDefault();
+    if (dragSrcRef.current === null || dragSrcRef.current === idx) return;
+    const src = dragSrcRef.current;
+    setSavedOrder(prev => {
+      const ord = [
+        ...prev.filter(k => SECTION_KEYS.includes(k)),
+        ...SECTION_KEYS.filter(k => !prev.includes(k)),
+      ];
+      const [removed] = ord.splice(src, 1);
+      ord.splice(idx, 0, removed);
+      dragSrcRef.current = idx;
+      return ord;
+    });
+  }
+  function onDragEnd() { dragSrcRef.current = null; }
+
+  // ─── Reset all settings ───────────────────────────────────────────────────────
+  function resetAll() {
+    if (!confirm("Reset all email settings to defaults?")) return;
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("cfc_")) keysToRemove.push(k);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    window.location.reload();
+  }
 
   // ─── Custom hooks ─────────────────────────────────────────────────────────────
   const instructors = useInstructors();
@@ -75,6 +116,17 @@ export default function App() {
           fetchLiveWx, setupRows, updateRow, applyManual, genAutoWx, COND_LIST } = weather;
 
   const { subjectId, changeSubject, hTitle, setHTitle, hSub, setHSub, hBullets, setHBullets, cycleTemplate } = header;
+
+  // ─── Spotlight helpers ────────────────────────────────────────────────────────
+  function toggleSpotlight(id) {
+    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), on: !prev[id]?.on } }));
+  }
+  function updateSpotlight(id, key, val) {
+    setSpotlights((prev) => ({ ...prev, [id]: { ...defaultSpot(prev[id]), [key]: val } }));
+  }
+  function defaultSpot(existing) {
+    return { on: false, bio: "", fun: "", ...existing };
+  }
 
   // ─── Date validation ─────────────────────────────────────────────────────────
   const dateError =
@@ -92,6 +144,8 @@ export default function App() {
       navTitle,
       poolCondOn, spotlights,
       showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+      videoOn, videoUrl, videoPoster, videoCaption,
+      sectionOrder,
     };
   }
 
@@ -105,6 +159,21 @@ export default function App() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
+
+  // ─── Section definitions for Step 3 ──────────────────────────────────────────
+  const sectionDefs = {
+    banner:      { label: "Non-Members Welcome Banner", on: showBanner,      set: setShowBanner },
+    poolLoc:     { label: "Pool Location Info",         on: showPoolLoc,     set: setShowPoolLoc },
+    poolCond:    { label: "Outdoor Pool Conditions",    on: poolCondOn,      set: setPoolCondOn },
+    weather:     { label: "Weather Forecast",           on: showWeather,     set: setShowWeather },
+    instructors: { label: "Meet Your Instructors",      on: showInstructors, set: setShowInstructors },
+    spotlights:  { label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on), custom: true },
+    rates:       { label: "Lesson Rates",               on: showRates,       set: setShowRates },
+    video:       { label: "Video",                      on: videoOn,         set: setVideoOn },
+    triathlon:   { label: "Triathlon Training",         on: triOn,           set: setTriOn },
+    cyclones:    { label: "Cooper Cyclones",            on: teamOn,          set: setTeamOn },
+    footerCta:   { label: "Footer Call-to-Action",      on: showFooterCta,   set: setShowFooterCta },
+  };
 
   // ─── Render ───────────────────────────────────────────────────────────────────
   return (
@@ -126,8 +195,8 @@ export default function App() {
         <div style={{ color: "#fff", fontSize: 15, fontWeight: "bold", fontFamily: "Georgia,serif", flex: 1 }}>
           Cooper Swim Tools
         </div>
-        {/* Mode toggle */}
-        <div style={{ display: "flex", gap: 6 }}>
+        {/* Mode toggle + Reset */}
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           {[["email", "✉ Email"], ["social", "📸 Social"]].map(([mode, label]) => (
             <button
               key={mode}
@@ -146,6 +215,21 @@ export default function App() {
               {label}
             </button>
           ))}
+          <button
+            onClick={resetAll}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 20,
+              border: "2px solid rgba(255,100,100,0.4)",
+              background: "transparent",
+              color: "rgba(255,180,180,0.9)",
+              fontWeight: "bold",
+              fontSize: 11,
+              cursor: "pointer",
+            }}
+          >
+            Reset
+          </button>
         </div>
       </div>
 
@@ -373,47 +457,58 @@ export default function App() {
         {/* ═══════════════ STEP 3 ═══════════════ */}
         {step === 3 && (
           <>
+            {/* Email Sections — draggable to reorder */}
             <Card>
               <SLabel text="Email Sections" />
               <p style={{ fontSize: 11, color: "#9aa8b5", margin: "0 0 14px" }}>
-                Toggle each section on or off. Sections with settings expand when turned on.
+                Toggle sections on or off. Drag ⠿ to reorder them in the email.
               </p>
 
-              {/* Section rows */}
-              {[
-                { key: "banner",      label: "Non-Members Welcome Banner", on: showBanner,      set: setShowBanner },
-                { key: "poolLoc",     label: "Pool Location Info",         on: showPoolLoc,     set: setShowPoolLoc },
-                { key: "poolCond",    label: "Outdoor Pool Conditions",    on: poolCondOn,      set: setPoolCondOn },
-                { key: "weather",     label: "Weather Forecast",           on: showWeather,     set: setShowWeather },
-                { key: "instructors", label: "Meet Your Instructors",      on: showInstructors, set: setShowInstructors },
-                { key: "spotlights",  label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on), custom: true },
-                { key: "rates",       label: "Lesson Rates",               on: showRates,       set: setShowRates },
-                { key: "triathlon",   label: "Triathlon Training",         on: triOn,           set: setTriOn },
-                { key: "cyclones",    label: "Cooper Cyclones",            on: teamOn,          set: setTeamOn },
-                { key: "footerCta",   label: "Footer Call-to-Action",      on: showFooterCta,   set: setShowFooterCta },
-              ].map(({ key, label, on, set, custom }) => (
-                <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f3f6" }}>
-                  <span style={{ fontSize: 13, color: NAVY, fontWeight: "500" }}>{label}</span>
-                  {custom ? (
-                    <span style={{ fontSize: 10, color: BLUE }}>Configured below ↓</span>
-                  ) : (
-                    <button
-                      onClick={() => set(v => !v)}
-                      style={{
-                        width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-                        background: on ? BLUE : "#d0d8e0", position: "relative", transition: "background 0.2s", flexShrink: 0,
-                      }}
-                      aria-label={`Toggle ${label}`}
-                    >
-                      <span style={{
-                        position: "absolute", top: 3, left: on ? 21 : 3,
-                        width: 18, height: 18, borderRadius: "50%", background: "#fff",
-                        transition: "left 0.2s", display: "block",
-                      }} />
-                    </button>
-                  )}
-                </div>
-              ))}
+              {sectionOrder.map((key, idx) => {
+                const def = sectionDefs[key];
+                if (!def) return null;
+                const { label, on, set, custom } = def;
+                return (
+                  <div
+                    key={key}
+                    draggable
+                    onDragStart={(e) => onDragStart(e, idx)}
+                    onDragOver={(e) => onDragOver(e, idx)}
+                    onDragEnd={onDragEnd}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "7px 0",
+                      borderBottom: "1px solid #f0f3f6",
+                      cursor: "grab",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+                      <span style={{ color: "#c0c8d0", fontSize: 16, userSelect: "none", lineHeight: 1, cursor: "grab" }}>⠿</span>
+                      <span style={{ fontSize: 13, color: NAVY, fontWeight: "500" }}>{label}</span>
+                    </div>
+                    {custom ? (
+                      <span style={{ fontSize: 10, color: BLUE }}>Configured below ↓</span>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); set(v => !v); }}
+                        style={{
+                          width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                          background: on ? BLUE : "#d0d8e0", position: "relative", transition: "background 0.2s", flexShrink: 0,
+                        }}
+                        aria-label={`Toggle ${label}`}
+                      >
+                        <span style={{
+                          position: "absolute", top: 3, left: on ? 21 : 3,
+                          width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                          transition: "left 0.2s", display: "block",
+                        }} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </Card>
 
             {/* ── Header & Logo ── */}
@@ -528,6 +623,62 @@ export default function App() {
                 </Card>
               );
             })}
+
+            {/* ── Video config ── */}
+            {videoOn && (
+              <Card>
+                <SLabel text="Video" />
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Import Video File (local preview)</label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) setVideoPreviewUrl(URL.createObjectURL(file));
+                    }}
+                    style={{ fontSize: 12, width: "100%", boxSizing: "border-box" }}
+                  />
+                  {videoPreviewUrl && (
+                    <video
+                      src={videoPreviewUrl}
+                      controls
+                      style={{ width: "100%", maxWidth: 420, borderRadius: 8, marginTop: 8, display: "block" }}
+                    />
+                  )}
+                  <p style={{ fontSize: 10, color: "#9aa8b5", margin: "4px 0 0" }}>
+                    To embed in the actual email, upload your video to a host (e.g. Google Drive, Dropbox, S3) and paste the MP4 URL below.
+                  </p>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Hosted Video URL (MP4 — for email)</label>
+                  <input
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="https://example.com/video.mp4"
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Thumbnail / Poster URL (optional)</label>
+                  <input
+                    value={videoPoster}
+                    onChange={(e) => setVideoPoster(e.target.value)}
+                    placeholder="https://example.com/thumbnail.jpg"
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Caption (optional)</label>
+                  <input
+                    value={videoCaption}
+                    onChange={(e) => setVideoCaption(e.target.value)}
+                    placeholder="e.g. Watch Coach Bobby demonstrate freestyle technique"
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                </div>
+              </Card>
+            )}
 
             {/* ── Triathlon config ── */}
             {triOn && (
