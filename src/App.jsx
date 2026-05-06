@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
-import { NAVY, BLUE, GOLD, GRN } from "./config.js";
+import { NAVY, BLUE, GOLD, GRN, COLORS } from "./config.js";
 import { useLocalStorage } from "./hooks/useLocalStorage.js";
 import SocialGenerator from "./components/SocialGenerator.jsx";
 import { fmtDate } from "./utils/date.js";
-import { buildEmailHtml, SECTION_KEYS } from "./utils/email.js";
+import { buildEmailHtml, SECTION_KEYS, initials } from "./utils/email.js";
 import { useInstructors } from "./hooks/useInstructors.js";
 import { useWeather } from "./hooks/useWeather.js";
 import { useHeaderForm } from "./hooks/useHeaderForm.js";
@@ -48,6 +48,7 @@ export default function App() {
   const [showRates,       setShowRates]        = useLocalStorage("cfc_showRates", true);
   const [showFooterCta,   setShowFooterCta]    = useLocalStorage("cfc_showFooterCta", true);
   const [spotlights, setSpotlights]            = useLocalStorage("cfc_spotlights", {});
+  const [customSpots, setCustomSpots]          = useLocalStorage("cfc_customSpots", []);
 
   const [teamTitle, setTeamTitle] = useLocalStorage("cfc_teamTitle", "Join the Cooper Cyclones!");
   const [teamDesc, setTeamDesc]   = useLocalStorage("cfc_teamDesc",
@@ -145,6 +146,18 @@ export default function App() {
     return { on: false, bio: "", fun: "", ...existing };
   }
 
+  // ─── Custom spotlight helpers ─────────────────────────────────────────────────
+  function addCustomSpot() {
+    const col = COLORS[customSpots.length % COLORS.length];
+    setCustomSpots(prev => [...prev, { id: "sp_" + Date.now(), name: "", role: "", bio: "", fun: "", col }]);
+  }
+  function updateCustomSpot(id, key, val) {
+    setCustomSpots(prev => prev.map(s => s.id === id ? { ...s, [key]: val } : s));
+  }
+  function removeCustomSpot(id) {
+    setCustomSpots(prev => prev.filter(s => s.id !== id));
+  }
+
   // ─── Date validation ─────────────────────────────────────────────────────────
   const dateError =
     startD && endD && new Date(endD + "T00:00:00") < new Date(startD + "T00:00:00")
@@ -159,7 +172,7 @@ export default function App() {
       triOn, triDate, triTitle, triDesc, triPrice,
       teamOn, teamTitle, teamDesc, teamExtra,
       navTitle,
-      poolCondOn, spotlights,
+      poolCondOn, spotlights, customSpots,
       showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
       videoOn, videoUrl, videoPoster, videoCaption,
       sectionOrder,
@@ -184,7 +197,7 @@ export default function App() {
     poolCond:    { label: "Outdoor Pool Conditions",    on: poolCondOn,      set: setPoolCondOn },
     weather:     { label: "Weather Forecast",           on: showWeather,     set: setShowWeather },
     instructors: { label: "Meet Your Instructors",      on: showInstructors, set: setShowInstructors },
-    spotlights:  { label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on), custom: true },
+    spotlights:  { label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on) || customSpots.some(s => s.name), custom: true },
     rates:       { label: "Lesson Rates",               on: showRates,       set: setShowRates },
     video:       { label: "Video",                      on: videoOn,         set: setVideoOn },
     triathlon:   { label: "Triathlon Training",         on: triOn,           set: setTriOn },
@@ -665,6 +678,83 @@ export default function App() {
                 </div>
               );
             })}
+
+            {/* ── Add Custom Spotlight ── */}
+            <div style={{ display: "flex", justifyContent: "flex-end", margin: "-4px 0 8px" }}>
+              <button
+                onClick={addCustomSpot}
+                style={{
+                  background: BLUE, color: "#fff", border: "none",
+                  padding: "7px 14px", borderRadius: 8, fontSize: 12,
+                  fontWeight: "bold", cursor: "pointer",
+                }}
+              >
+                + Add Spotlight
+              </button>
+            </div>
+
+            {customSpots.map((spot) => (
+              <Card key={spot.id}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: "50%", background: spot.col,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, fontWeight: "bold", color: "#fff", flexShrink: 0,
+                    }}>
+                      {initials(spot.name) || "?"}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: "bold", color: NAVY }}>
+                      {spot.name || "New Spotlight"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => removeCustomSpot(spot.id)}
+                    aria-label="Remove spotlight"
+                    style={{ background: "none", border: "none", color: "#c00", cursor: "pointer", fontSize: 20, lineHeight: 1, padding: "0 4px" }}
+                  >×</button>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Name</label>
+                    <input
+                      value={spot.name}
+                      onChange={(e) => updateCustomSpot(spot.id, "name", e.target.value)}
+                      placeholder="Full Name"
+                      style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Role / Title</label>
+                    <input
+                      value={spot.role}
+                      onChange={(e) => updateCustomSpot(spot.id, "role", e.target.value)}
+                      placeholder="e.g. Swim Instructor"
+                      style={{ width: "100%", padding: "6px 8px", border: "1px solid #e8ecf0", borderRadius: 6, fontSize: 12, boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Bio / Description</label>
+                  <textarea
+                    value={spot.bio}
+                    onChange={(e) => updateCustomSpot(spot.id, "bio", e.target.value)}
+                    rows={3}
+                    placeholder="Background, specialty, teaching style..."
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Fun Fact (optional)</label>
+                  <input
+                    value={spot.fun}
+                    onChange={(e) => updateCustomSpot(spot.id, "fun", e.target.value)}
+                    placeholder="e.g. Former varsity swimmer, completed 5 triathlons..."
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                </div>
+              </Card>
+            ))}
 
             {/* ── Video config ── */}
             {videoOn && (

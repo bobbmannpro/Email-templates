@@ -207,9 +207,8 @@ export function buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra) {
   );
 }
 
-export function buildSpotlightBlocks(instOrder, insts, spotlights) {
-  if (!spotlights) return "";
-  return instOrder
+export function buildSpotlightBlocks(instOrder, insts, spotlights, customSpots = []) {
+  const instHtml = (!spotlights ? [] : instOrder
     .filter((id) => insts[id] && spotlights[id]?.on)
     .map((id) => {
       const s   = insts[id];
@@ -243,7 +242,32 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights) {
         `</td></tr>`
       );
     })
+  ).join("");
+
+  const customHtml = (customSpots || [])
+    .filter((s) => s.name && s.name.trim())
+    .map((s) => {
+      const avatarSize = 72;
+      const ini = initials(s.name);
+      const avatar = `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:${s.col || "#1e88c7"};text-align:center;line-height:${avatarSize}px;font-size:20px;font-weight:bold;color:#fff;border:3px solid #1e88c7;flex-shrink:0;">${ini}</div>`;
+      return (
+        `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
+        `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Instructor Spotlight</p>` +
+        `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;"><tr>` +
+        `<td width="${avatarSize + 24}" style="padding:16px 0 16px 16px;vertical-align:top;">${avatar}</td>` +
+        `<td style="padding:16px 12px 16px 4px;vertical-align:top;">` +
+        `<p style="font-family:Georgia,serif;font-size:15px;color:#0b2545;font-weight:bold;margin:0 0 2px;">${s.name}</p>` +
+        `<p style="font-size:10px;color:#1e88c7;font-weight:bold;text-transform:uppercase;margin:0 0 8px;">${s.role || ""}</p>` +
+        (s.bio ? `<p style="font-size:12px;color:#5a6a78;line-height:1.6;margin:0 0 8px;">${nl2br(s.bio)}</p>` : "") +
+        (s.fun ? `<p style="font-size:11px;color:#e8a838;font-weight:bold;margin:0;">⭐ ${s.fun}</p>` : "") +
+        `</td></tr></table>` +
+        `<p style="text-align:center;margin:12px 0 0;"><a href="${BOOK_URL}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:8px 22px;border-radius:20px;">Book a Lesson with ${s.name.split(" ")[0]}</a></p>` +
+        `</td></tr>`
+      );
+    })
     .join("");
+
+  return instHtml + customHtml;
 }
 
 export function buildPoolCondBlock(poolCondOn) {
@@ -263,17 +287,29 @@ export function buildPoolCondBlock(poolCondOn) {
 
 export function buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption) {
   if (!videoOn) return "";
-  const posterAttr = videoPoster ? ` poster="${videoPoster}"` : "";
   const captionHtml = videoCaption
     ? `<p style="font-size:12px;color:#5a6a78;text-align:center;margin:10px 0 0;">${videoCaption}</p>`
     : "";
-  const fallback = videoPoster
-    ? `<a href="${videoUrl}" style="display:block;"><img src="${videoPoster}" width="520" alt="Watch video" style="max-width:100%;border-radius:10px;display:block;margin:0 auto;" /></a>`
-    : `<p style="text-align:center;margin:12px 0 0;"><a href="${videoUrl}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:10px 24px;border-radius:24px;">&#9654; Watch Video</a></p>`;
 
-  const inner = videoUrl
-    ? `<video controls${posterAttr} style="width:100%;max-width:520px;border-radius:10px;display:block;margin:0 auto;"><source src="${videoUrl}" type="video/mp4">${fallback}</video>`
-    : `<div style="padding:24px;background:#f5f7f9;border-radius:10px;text-align:center;font-size:12px;color:#9aa8b5;">Add a hosted video URL to embed in the email.</div>`;
+  let inner;
+  if (!videoUrl) {
+    inner = `<div style="padding:24px;background:#f5f7f9;border-radius:10px;text-align:center;font-size:12px;color:#9aa8b5;">Add a hosted video URL to embed in the email.</div>`;
+  } else if (videoPoster) {
+    // Clickable thumbnail — works in all email clients
+    inner =
+      `<a href="${videoUrl}" target="_blank" style="display:block;line-height:0;">` +
+      `<img src="${videoPoster}" width="520" alt="${videoCaption || "Watch video"}" style="width:100%;max-width:520px;border-radius:10px;display:block;margin:0 auto;" />` +
+      `</a>` +
+      `<p style="text-align:center;margin:10px 0 0;">` +
+      `<a href="${videoUrl}" target="_blank" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;text-decoration:none;padding:8px 20px;border-radius:20px;">&#9654;&nbsp; Watch Video</a>` +
+      `</p>`;
+  } else {
+    // No thumbnail — plain "Watch Video" button
+    inner =
+      `<p style="text-align:center;margin:0;">` +
+      `<a href="${videoUrl}" target="_blank" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:24px;">&#9654;&nbsp; Watch Video</a>` +
+      `</p>`;
+  }
 
   return (
     `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
@@ -290,7 +326,7 @@ export function buildEmailHtml(opts) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
-    poolCondOn, spotlights,
+    poolCondOn, spotlights, customSpots,
     navTitle,
     showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
     videoOn, videoUrl, videoPoster, videoCaption,
@@ -317,7 +353,7 @@ export function buildEmailHtml(opts) {
     poolCond:    () => buildPoolCondBlock(poolCondOn),
     weather:     () => showWeather !== false ? buildWeatherBlock(forecast) : "",
     instructors: () => showInstructors !== false ? buildInstructorBlock(instOrder, insts) : "",
-    spotlights:  () => buildSpotlightBlocks(instOrder, insts, spotlights),
+    spotlights:  () => buildSpotlightBlocks(instOrder, insts, spotlights, customSpots),
     rates:       () => showRates !== false ? buildRatesBlock() : "",
     video:       () => buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption),
     triathlon:   () => buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice),

@@ -7,9 +7,10 @@ export default function EmailPreview({ opts, pvMode }) {
     title, subtitle, bullets,
     triOn, triDate, triTitle, triDesc, triPrice,
     teamOn, teamTitle, teamDesc, teamExtra,
-    poolCondOn, spotlights,
+    poolCondOn, spotlights, customSpots,
     navTitle,
     showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+    videoOn, videoUrl, videoPoster, videoCaption,
   } = opts;
 
   const maxW  = pvMode === "mobile" ? 375 : 600;
@@ -516,6 +517,54 @@ export default function EmailPreview({ opts, pvMode }) {
           </div>
         );
       })}
+
+      {/* Video */}
+      {videoOn && (
+        <div style={{ ...sec }}>
+          {videoUrl ? (
+            <video
+              controls
+              poster={videoPoster || undefined}
+              style={{ width: "100%", maxWidth: 520, borderRadius: 10, display: "block", margin: "0 auto" }}
+            >
+              <source src={videoUrl} type="video/mp4" />
+            </video>
+          ) : (
+            <div style={{ padding: 24, background: "#f5f7f9", borderRadius: 10, textAlign: "center", fontSize: 12, color: "#9aa8b5" }}>
+              Add a hosted video URL to embed in the email.
+            </div>
+          )}
+          {videoCaption && (
+            <p style={{ fontSize: 12, color: "#5a6a78", textAlign: "center", margin: "10px 0 0" }}>{videoCaption}</p>
+          )}
+        </div>
+      )}
+
+      {/* Custom Spotlights */}
+      {(customSpots || []).filter(s => s.name).map((s) => (
+        <div key={s.id} style={{ ...sec }}>
+          <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>
+            Instructor Spotlight
+          </p>
+          <div style={{ background: "#f5f7f9", border: "1px solid #e8ecf0", borderRadius: 10, padding: 14, display: "flex", gap: 12, alignItems: "flex-start" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: s.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: "bold", color: "#fff", border: "3px solid #1e88c7", flexShrink: 0 }}>
+              {s.name.split(" ").filter(Boolean).map(w => w[0]).join("").toUpperCase().slice(0, 2) || "?"}
+            </div>
+            <div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 14, fontWeight: "bold", color: "#0b2545", marginBottom: 2 }}>{s.name}</div>
+              <div style={{ fontSize: 10, color: "#1e88c7", fontWeight: "bold", textTransform: "uppercase", marginBottom: 6 }}>{s.role}</div>
+              {s.bio && <div style={{ ...small, color: "#5a6a78", lineHeight: 1.6, whiteSpace: "pre-line" }}>{s.bio}</div>}
+              {s.fun && <div style={{ fontSize: 11, color: "#e8a838", fontWeight: "bold", marginTop: 5 }}>⭐ {s.fun}</div>}
+            </div>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 10 }}>
+            <a href={BOOK_URL} target="_blank" rel="noreferrer"
+              style={{ display: "inline-block", background: "#1e88c7", color: "#fff", fontSize: 11, fontWeight: "bold", padding: "7px 18px", borderRadius: 18, textDecoration: "none" }}>
+              Book a Lesson with {s.name.split(" ")[0]}
+            </a>
+          </div>
+        </div>
+      ))}
 
       {/* Triathlon */}
       {triOn && (
