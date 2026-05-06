@@ -227,9 +227,16 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights, customSpots =
         ? `<img src="${EMAIL_IMAGE_BASE}/${s.photo}" alt="${s.name}" width="${avatarSize}" height="${avatarSize}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:${avatarBorder};display:block;flex-shrink:0;" />`
         : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:${s.col};text-align:center;line-height:${avatarSize}px;font-size:20px;font-weight:bold;color:${s.dark ? "#0b2545" : "#fff"};border:${avatarBorder};flex-shrink:0;">${s.ini}</div>`;
 
+      const clipHtml = sp.clip
+        ? `<video autoplay="" muted="" loop="" playsinline=""` +
+          (s.photo ? ` poster="${EMAIL_IMAGE_BASE}/${s.photo}"` : "") +
+          ` style="width:100%;border-radius:10px;margin-bottom:12px;display:block;">` +
+          `<source src="${sp.clip}" type="video/mp4"></video>`
+        : "";
       return (
         `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
         `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Instructor Spotlight</p>` +
+        clipHtml +
         `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${bg};border:${border};border-radius:12px;"><tr>` +
         `<td width="${avatarSize + 24}" style="padding:16px 0 16px 16px;vertical-align:top;">${avatar}</td>` +
         `<td style="padding:16px 12px 16px 4px;vertical-align:top;">` +
@@ -250,9 +257,14 @@ export function buildSpotlightBlocks(instOrder, insts, spotlights, customSpots =
       const avatarSize = 72;
       const ini = initials(s.name);
       const avatar = `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:${s.col || "#1e88c7"};text-align:center;line-height:${avatarSize}px;font-size:20px;font-weight:bold;color:#fff;border:3px solid #1e88c7;flex-shrink:0;">${ini}</div>`;
+      const customClipHtml = s.clip
+        ? `<video autoplay="" muted="" loop="" playsinline="" style="width:100%;border-radius:10px;margin-bottom:12px;display:block;">` +
+          `<source src="${s.clip}" type="video/mp4"></video>`
+        : "";
       return (
         `<tr><td style="padding:18px 20px;border-bottom:1px solid #e8ecf0;">` +
         `<p style="font-size:11px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;">Instructor Spotlight</p>` +
+        customClipHtml +
         `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;"><tr>` +
         `<td width="${avatarSize + 24}" style="padding:16px 0 16px 16px;vertical-align:top;">${avatar}</td>` +
         `<td style="padding:16px 12px 16px 4px;vertical-align:top;">` +

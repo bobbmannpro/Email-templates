@@ -492,6 +492,14 @@ export default function EmailPreview({ opts, pvMode }) {
             <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>
               Instructor Spotlight
             </p>
+            {sp.clip && (
+              <video autoPlay muted loop playsInline
+                poster={s.photo ? `${import.meta.env.BASE_URL}photos/${s.photo}` : undefined}
+                style={{ width: "100%", borderRadius: 10, marginBottom: 12, display: "block" }}
+              >
+                <source src={sp.clip} type="video/mp4" />
+              </video>
+            )}
             <div style={{ background: isBobby ? "#0b2545" : "#f5f7f9", border: isBobby ? "none" : "1px solid #e8ecf0", borderRadius: 10, padding: 14, display: "flex", gap: 12, alignItems: "flex-start" }}>
               {s.photo ? (
                 <img src={`${import.meta.env.BASE_URL}photos/${s.photo}`} alt={s.name}
@@ -546,6 +554,13 @@ export default function EmailPreview({ opts, pvMode }) {
           <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", textTransform: "uppercase", letterSpacing: 1, margin: "0 0 10px" }}>
             Instructor Spotlight
           </p>
+          {s.clip && (
+            <video autoPlay muted loop playsInline
+              style={{ width: "100%", borderRadius: 10, marginBottom: 12, display: "block" }}
+            >
+              <source src={s.clip} type="video/mp4" />
+            </video>
+          )}
           <div style={{ background: "#f5f7f9", border: "1px solid #e8ecf0", borderRadius: 10, padding: 14, display: "flex", gap: 12, alignItems: "flex-start" }}>
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: s.col, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: "bold", color: "#fff", border: "3px solid #1e88c7", flexShrink: 0 }}>
               {s.name.split(" ").filter(Boolean).map(w => w[0]).join("").toUpperCase().slice(0, 2) || "?"}

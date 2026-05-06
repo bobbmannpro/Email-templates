@@ -647,7 +647,7 @@ export default function App() {
                           style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
                         />
                       </div>
-                      <div style={{ marginBottom: 10 }}>
+                      <div style={{ marginBottom: 8 }}>
                         <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Fun Fact (optional)</label>
                         <input
                           value={spot.fun}
@@ -655,6 +655,18 @@ export default function App() {
                           placeholder="e.g. Competed in 3 triathlons, former varsity swimmer..."
                           style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
                         />
+                      </div>
+                      <div style={{ marginBottom: 10 }}>
+                        <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Greeting Clip URL (optional)</label>
+                        <input
+                          value={spot.clip || ""}
+                          onChange={(e) => updateSpotlight(id, "clip", e.target.value)}
+                          placeholder="https://example.com/bobby-hello.mp4"
+                          style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                        />
+                        <p style={{ fontSize: 10, color: "#9aa8b5", margin: "4px 0 0" }}>
+                          Plays in Apple Mail &amp; Samsung Mail. Gmail users see the normal spotlight card — no error.
+                        </p>
                       </div>
                       <div style={{ padding: 10, background: "#f5f7f9", border: "1px solid #e8ecf0", borderRadius: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
                         {inst.photo ? (
@@ -744,7 +756,7 @@ export default function App() {
                     style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box", resize: "vertical", lineHeight: 1.5 }}
                   />
                 </div>
-                <div>
+                <div style={{ marginBottom: 8 }}>
                   <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Fun Fact (optional)</label>
                   <input
                     value={spot.fun}
@@ -752,6 +764,18 @@ export default function App() {
                     placeholder="e.g. Former varsity swimmer, completed 5 triathlons..."
                     style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
                   />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Greeting Clip URL (optional)</label>
+                  <input
+                    value={spot.clip || ""}
+                    onChange={(e) => updateCustomSpot(spot.id, "clip", e.target.value)}
+                    placeholder="https://example.com/hello.mp4"
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, boxSizing: "border-box" }}
+                  />
+                  <p style={{ fontSize: 10, color: "#9aa8b5", margin: "4px 0 0" }}>
+                    Plays in Apple Mail &amp; Samsung Mail. Gmail users see the normal spotlight card — no error.
+                  </p>
                 </div>
               </Card>
             ))}
