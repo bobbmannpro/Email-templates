@@ -690,10 +690,6 @@ export default function EmailPreview({ opts, pvMode }) {
         </p>
       </div>}
 
-      {/* Footer */}
-      <div style={{ background: "#071a33", padding: "12px 18px", textAlign: "center" }}>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: 0 }}>cooperfitness.com</p>
-      </div>
     </div>
   );
 }

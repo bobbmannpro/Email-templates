@@ -422,9 +422,6 @@ video{max-width:100%;display:block;}
 
 ${middleSections}
 
-<tr><td style="background:#071a33;padding:14px 20px;text-align:center;">
-<p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0;"><a href="https://cooperfitness.com" style="color:rgba(255,255,255,0.4);text-decoration:none;">cooperfitness.com</a></p>
-</td></tr>
 
 </table></td></tr></table></body></html>`;
 }
