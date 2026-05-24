@@ -1,4 +1,4 @@
-import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS, FORECAST_ZIP_LABEL, EMAIL_IMAGE_BASE } from "../config.js";
+import { BOOK_URL, COACH_EMAIL, FORECAST_ZIP_LABEL, EMAIL_IMAGE_BASE } from "../config.js";
 import { fmtDate } from "./date.js";
 
 function nl2br(str) {
@@ -131,10 +131,10 @@ export function buildInstructorBlock(instOrder, insts) {
   );
 }
 
-export function buildRatesBlock() {
+export function buildProRatesBlock() {
   return `
 <tr><td class="pad" style="padding:20px;border-bottom:1px solid #e8ecf0;">
-<p style="font-family:Georgia,serif;font-size:17px;color:#0b2545;margin:0 0 12px;">Lesson Rates</p>
+<p style="font-family:Georgia,serif;font-size:17px;color:#0b2545;margin:0 0 12px;">Pro Rates</p>
 <p style="margin:0 0 5px;"><span style="display:inline-block;font-size:9px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:12px;background:#0b2545;color:#fff;">Pro</span>&nbsp;<span style="font-family:Georgia,serif;font-size:13px;color:#0b2545;">Bobby Manning</span></p>
 <p style="font-size:10px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:10px 0 4px;">Private Lessons</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
@@ -150,7 +150,15 @@ export function buildRatesBlock() {
 <tr><td style="font-size:13px;padding:7px 8px;border-bottom:1px solid #e8ecf0;">45 min</td><td style="font-size:13px;padding:7px 8px;border-bottom:1px solid #e8ecf0;color:#0b2545;font-weight:bold;text-align:right;">$65</td></tr>
 <tr><td style="font-size:13px;padding:7px 8px;">60 min</td><td style="font-size:13px;padding:7px 8px;color:#0b2545;font-weight:bold;text-align:right;">$85</td></tr>
 </table>
-<div style="height:1px;background:#e8ecf0;margin:16px 0;"></div>
+<p style="text-align:center;margin:14px 0 0;"><a href="${BOOK_URL}" style="display:inline-block;background:#1e88c7;color:#fff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:10px 26px;border-radius:24px;">Book Now</a></p>
+<p style="font-size:11px;color:#9aa8b5;text-align:center;margin:8px 0 0;">Members and non-members welcome.</p>
+</td></tr>`;
+}
+
+export function buildInstructorRatesBlock() {
+  return `
+<tr><td class="pad" style="padding:20px;border-bottom:1px solid #e8ecf0;">
+<p style="font-family:Georgia,serif;font-size:17px;color:#0b2545;margin:0 0 12px;">Instructor Rates</p>
 <p style="margin:0 0 5px;"><span style="display:inline-block;font-size:9px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:12px;background:#1e88c7;color:#fff;">Instructor</span></p>
 <p style="font-size:10px;font-weight:bold;color:#1e88c7;text-transform:uppercase;letter-spacing:1px;margin:10px 0 4px;">Private Lessons</p>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
@@ -330,7 +338,7 @@ export function buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption) {
   );
 }
 
-export const SECTION_KEYS = ["banner","poolLoc","poolCond","weather","instructors","spotlights","rates","video","triathlon","cyclones","footerCta"];
+export const SECTION_KEYS = ["banner","poolLoc","poolCond","weather","instructors","spotlights","ratesPro","ratesInst","video","triathlon","cyclones","footerCta"];
 
 export function buildEmailHtml(opts) {
   const {
@@ -340,7 +348,7 @@ export function buildEmailHtml(opts) {
     teamOn, teamTitle, teamDesc, teamExtra,
     poolCondOn, spotlights, customSpots,
     navTitle,
-    showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+    showBanner, showPoolLoc, showWeather, showInstructors, showProRates, showInstRates, showFooterCta,
     videoOn, videoUrl, videoPoster, videoCaption,
     sectionOrder,
   } = opts;
@@ -366,7 +374,8 @@ export function buildEmailHtml(opts) {
     weather:     () => showWeather !== false ? buildWeatherBlock(forecast) : "",
     instructors: () => showInstructors !== false ? buildInstructorBlock(instOrder, insts) : "",
     spotlights:  () => buildSpotlightBlocks(instOrder, insts, spotlights, customSpots),
-    rates:       () => showRates !== false ? buildRatesBlock() : "",
+    ratesPro:    () => showProRates !== false ? buildProRatesBlock() : "",
+    ratesInst:   () => showInstRates !== false ? buildInstructorRatesBlock() : "",
     video:       () => buildVideoBlock(videoOn, videoUrl, videoPoster, videoCaption),
     triathlon:   () => buildTriathlonBlock(triOn, triDate, triTitle, triDesc, triPrice),
     cyclones:    () => buildTeamBlock(teamOn, teamTitle, teamDesc, teamExtra),
@@ -414,7 +423,6 @@ video{max-width:100%;display:block;}
 ${middleSections}
 
 <tr><td style="background:#071a33;padding:14px 20px;text-align:center;">
-<p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0 0 2px;">${FACILITY_ADDRESS}</p>
 <p style="font-size:10px;color:rgba(255,255,255,0.35);margin:0;"><a href="https://cooperfitness.com" style="color:rgba(255,255,255,0.4);text-decoration:none;">cooperfitness.com</a></p>
 </td></tr>
 

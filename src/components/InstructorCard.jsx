@@ -1,4 +1,4 @@
-import { NAVY, BLUE, GOLD } from "../config.js";
+import { NAVY, BLUE, GOLD, PHOTO_FILES } from "../config.js";
 import { FI } from "./ui.jsx";
 
 function badgeColors(badge, bb, bc) {
@@ -93,6 +93,29 @@ export default function InstructorCard({ id, st, togInst, updInst, removeInst })
             <FI id={`inst-avail-${id}`} label="Availability" value={st.avail} onChange={(v) => updInst(id, "avail", v)} placeholder="e.g. Mon-Fri" />
             <FI id={`inst-ages-${id}`} label="Ages" value={st.ages} onChange={(v) => updInst(id, "ages", v)} placeholder="All ages" />
             <FI id={`inst-badge-${id}`} label="Badge" value={st.badge} onChange={(v) => updInst(id, "badge", v)} placeholder="Available" />
+          </div>
+          <div style={{ marginBottom: 10 }}>
+            <label htmlFor={`inst-photo-${id}`} style={{ display: "block", fontSize: 11, color: "#5a6a78", marginBottom: 3 }}>Profile Photo</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <select
+                id={`inst-photo-${id}`}
+                value={st.photo || ""}
+                onChange={(e) => updInst(id, "photo", e.target.value || null)}
+                style={{ flex: 1, padding: "7px 8px", border: "1px solid #e8ecf0", borderRadius: 8, fontSize: 12, background: "#fff" }}
+              >
+                <option value="">— No photo (use initials) —</option>
+                {PHOTO_FILES.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+              {st.photo && (
+                <img
+                  src={`${import.meta.env.BASE_URL}photos/${st.photo}`}
+                  alt={st.name}
+                  style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", border: `2px solid ${BLUE}`, flexShrink: 0 }}
+                />
+              )}
+            </div>
           </div>
           <div
             style={{

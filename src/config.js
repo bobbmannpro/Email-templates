@@ -48,6 +48,18 @@ export const COND_LIST = [
 // ─── Instructor Avatar Colors (for custom instructors) ────────────────────────
 export const COLORS = [BLUE, "#5c6bc0", "#26a69a", "#ef5350", "#ab47bc", "#66bb6a", "#ffa726"];
 
+// ─── Photos available in public/photos/ ──────────────────────────────────────
+export const PHOTO_FILES = [
+  "ayden.jpg",
+  "bobby.jpg",
+  "caden.jpg",
+  "madeline.jpg",
+  "olivia.jpg",
+  "peyton.jpg",
+  "riley_d.jpg",
+  "riley_n.jpg",
+];
+
 // ─── Email Header Templates (subtitle + bullets pool) ────────────────────────
 export const HEADER_TEMPLATES = [
   {

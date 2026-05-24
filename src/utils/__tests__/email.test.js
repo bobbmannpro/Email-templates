@@ -3,7 +3,8 @@ import {
   buildPoolBlock,
   buildWeatherBlock,
   buildInstructorBlock,
-  buildRatesBlock,
+  buildProRatesBlock,
+  buildInstructorRatesBlock,
   buildTriathlonBlock,
   buildTeamBlock,
   buildEmailHtml,
@@ -45,17 +46,23 @@ describe("buildWeatherBlock", () => {
   });
 });
 
-describe("buildRatesBlock", () => {
+describe("buildProRatesBlock", () => {
   it("contains Bobby 30-min rate of $80", () => {
-    expect(buildRatesBlock()).toContain("$80");
+    expect(buildProRatesBlock()).toContain("$80");
   });
 
+  it("contains Pro Rates heading", () => {
+    expect(buildProRatesBlock()).toContain("Pro Rates");
+  });
+});
+
+describe("buildInstructorRatesBlock", () => {
   it("contains Instructor 30-min rate of $60", () => {
-    expect(buildRatesBlock()).toContain("$60");
+    expect(buildInstructorRatesBlock()).toContain("$60");
   });
 
-  it("contains Lesson Rates heading", () => {
-    expect(buildRatesBlock()).toContain("Lesson Rates");
+  it("contains Instructor Rates heading", () => {
+    expect(buildInstructorRatesBlock()).toContain("Instructor Rates");
   });
 });
 

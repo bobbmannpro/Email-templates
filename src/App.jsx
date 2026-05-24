@@ -45,7 +45,8 @@ export default function App() {
   const [showPoolLoc,     setShowPoolLoc]      = useLocalStorage("cfc_showPoolLoc", true);
   const [showWeather,     setShowWeather]      = useLocalStorage("cfc_showWeather", true);
   const [showInstructors, setShowInstructors]  = useLocalStorage("cfc_showInstructors", true);
-  const [showRates,       setShowRates]        = useLocalStorage("cfc_showRates", true);
+  const [showProRates,    setShowProRates]      = useLocalStorage("cfc_showProRates", true);
+  const [showInstRates,   setShowInstRates]     = useLocalStorage("cfc_showInstRates", true);
   const [showFooterCta,   setShowFooterCta]    = useLocalStorage("cfc_showFooterCta", true);
   const [spotlights, setSpotlights]            = useLocalStorage("cfc_spotlights", {});
   const [customSpots, setCustomSpots]          = useLocalStorage("cfc_customSpots", []);
@@ -173,7 +174,7 @@ export default function App() {
       teamOn, teamTitle, teamDesc, teamExtra,
       navTitle,
       poolCondOn, spotlights, customSpots,
-      showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+      showBanner, showPoolLoc, showWeather, showInstructors, showProRates, showInstRates, showFooterCta,
       videoOn, videoUrl, videoPoster, videoCaption,
       sectionOrder,
     };
@@ -198,7 +199,8 @@ export default function App() {
     weather:     { label: "Weather Forecast",           on: showWeather,     set: setShowWeather },
     instructors: { label: "Meet Your Instructors",      on: showInstructors, set: setShowInstructors },
     spotlights:  { label: "Instructor Spotlights",      on: Object.values(spotlights).some(s => s.on) || customSpots.some(s => s.name), custom: true },
-    rates:       { label: "Lesson Rates",               on: showRates,       set: setShowRates },
+    ratesPro:    { label: "Pro Rates (Bobby Manning)",   on: showProRates,    set: setShowProRates },
+    ratesInst:   { label: "Instructor Rates",            on: showInstRates,   set: setShowInstRates },
     video:       { label: "Video",                      on: videoOn,         set: setVideoOn },
     triathlon:   { label: "Triathlon Training",         on: triOn,           set: setTriOn },
     cyclones:    { label: "Cooper Cyclones",            on: teamOn,          set: setTeamOn },

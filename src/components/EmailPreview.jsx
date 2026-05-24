@@ -1,4 +1,4 @@
-import { BOOK_URL, COACH_EMAIL, FACILITY_ADDRESS } from "../config.js";
+import { BOOK_URL, COACH_EMAIL } from "../config.js";
 import { fmtDate } from "../utils/date.js";
 
 export default function EmailPreview({ opts, pvMode }) {
@@ -9,7 +9,7 @@ export default function EmailPreview({ opts, pvMode }) {
     teamOn, teamTitle, teamDesc, teamExtra,
     poolCondOn, spotlights, customSpots,
     navTitle,
-    showBanner, showPoolLoc, showWeather, showInstructors, showRates, showFooterCta,
+    showBanner, showPoolLoc, showWeather, showInstructors, showProRates, showInstRates, showFooterCta,
     videoOn, videoUrl, videoPoster, videoCaption,
   } = opts;
 
@@ -428,57 +428,33 @@ export default function EmailPreview({ opts, pvMode }) {
         </div>
       )}
 
-      {/* Rates summary */}
-      {showRates !== false && <div style={{ ...sec }}>
-        <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 10px" }}>
-          Lesson Rates
+      {/* Pro Rates */}
+      {showProRates !== false && <div style={{ ...sec }}>
+        <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 10px" }}>Pro Rates</p>
+        <p style={{ fontSize: 10, fontWeight: "bold", color: "#0b2545", margin: "0 0 4px" }}>
+          Bobby Manning{" "}
+          <span style={{ background: "#0b2545", color: "#fff", fontSize: 8, padding: "1px 6px", borderRadius: 8, marginLeft: 4 }}>PRO</span>
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <div>
-            <p style={{ fontSize: 10, fontWeight: "bold", color: "#0b2545", margin: "0 0 4px" }}>
-              Bobby Manning{" "}
-              <span
-                style={{
-                  background: "#0b2545",
-                  color: "#fff",
-                  fontSize: 8,
-                  padding: "1px 6px",
-                  borderRadius: 8,
-                  marginLeft: 4,
-                }}
-              >
-                PRO
-              </span>
-            </p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>30 min — $80</p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>45 min — $120</p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: 0 }}>60 min — $160</p>
-          </div>
-          <div>
-            <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", margin: "0 0 4px" }}>Instructors</p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>15 min — $30</p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>30 min — $60</p>
-            <p style={{ fontSize: 11, color: "#5a6a78", margin: 0 }}>45 min — $90 / 60 min — $120</p>
-          </div>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>30 min — $80</p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>45 min — $120</p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 10px" }}>60 min — $160</p>
+        <div style={{ textAlign: "center" }}>
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" style={{ display: "inline-block", background: "#1e88c7", color: "#fff", fontSize: 12, fontWeight: "bold", padding: "9px 24px", borderRadius: 22, textDecoration: "none" }}>Book Now</a>
         </div>
-        <div style={{ textAlign: "center", marginTop: 12 }}>
-          <a
-            href={BOOK_URL}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "inline-block",
-              background: "#1e88c7",
-              color: "#fff",
-              fontSize: 12,
-              fontWeight: "bold",
-              padding: "9px 24px",
-              borderRadius: 22,
-              textDecoration: "none",
-            }}
-          >
-            Book Now
-          </a>
+      </div>}
+
+      {/* Instructor Rates */}
+      {showInstRates !== false && <div style={{ ...sec }}>
+        <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "#0b2545", margin: "0 0 10px" }}>Instructor Rates</p>
+        <p style={{ fontSize: 10, fontWeight: "bold", color: "#1e88c7", margin: "0 0 4px" }}>
+          <span style={{ background: "#1e88c7", color: "#fff", fontSize: 8, padding: "1px 6px", borderRadius: 8, marginRight: 4 }}>INSTRUCTOR</span>
+        </p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>15 min (age 3 &amp; under) — $30</p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>30 min — $60</p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 1px" }}>45 min — $90</p>
+        <p style={{ fontSize: 11, color: "#5a6a78", margin: "0 0 10px" }}>60 min — $120</p>
+        <div style={{ textAlign: "center" }}>
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" style={{ display: "inline-block", background: "#1e88c7", color: "#fff", fontSize: 12, fontWeight: "bold", padding: "9px 24px", borderRadius: 22, textDecoration: "none" }}>Book Now</a>
         </div>
       </div>}
 
@@ -716,9 +692,7 @@ export default function EmailPreview({ opts, pvMode }) {
 
       {/* Footer */}
       <div style={{ background: "#071a33", padding: "12px 18px", textAlign: "center" }}>
-        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: 0 }}>
-          {FACILITY_ADDRESS}
-        </p>
+        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", margin: 0 }}>cooperfitness.com</p>
       </div>
     </div>
   );
