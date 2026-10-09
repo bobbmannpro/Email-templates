@@ -192,3 +192,16 @@ details.more summary { cursor: pointer; color: var(--blue); font-weight: 650; }
   .rate-row { grid-template-columns: 1fr 84px 32px; }
   .pv-frame { border: 0; background: #e8ecf0; display: block; max-width: none; }
 }
+
+/* On/Off switches */
+.bswitch { display: inline-flex; align-items: center; margin-left: 2px; }
+.bswitch .tog-lbl { font-size: 11px; width: 22px; color: var(--soft); }
+.bswitch .tog .knob { width: 36px; height: 21px; }
+.bswitch .tog .knob::after { width: 15px; height: 15px; }
+.bswitch .tog.on .knob::after { left: 18px; }
+.pp-bar { display: flex; align-items: center; gap: 12px; padding: 8px 10px; font-size: 12px; color: var(--soft); border-bottom: 1px solid var(--line); background: #fafcfe; }
+.pp-bar.top { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; background: #fff; }
+.pp-bar span { flex: 1; }
+.link-btn.inline { display: inline; padding: 0; }
+.pp-name small { display: block; font-size: 11px; color: var(--soft); }
+.pp-row { justify-content: space-between; }

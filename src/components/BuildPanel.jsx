@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BLOCK_TYPES, COMMON_FIELDS, blockSummary, createBlock, newId } from "../lib/blocks.js";
 import { TEMPLATES, fromTemplate } from "../lib/defaults.js";
-import { Field } from "./Fields.jsx";
+import { Field, Toggle } from "./Fields.jsx";
 
 function BlockCard({ block, index, count, open, onOpen, ctl, brand, roster }) {
   const def = BLOCK_TYPES[block.type];
@@ -32,7 +32,9 @@ function BlockCard({ block, index, count, open, onOpen, ctl, brand, roster }) {
         <div className="bctl">
           <button type="button" className="ib" onClick={() => ctl.move(index, index - 1)} disabled={index === 0} title="Move up" aria-label="Move up">↑</button>
           <button type="button" className="ib" onClick={() => ctl.move(index, index + 1)} disabled={index === count - 1} title="Move down" aria-label="Move down">↓</button>
-          <button type="button" className={"ib" + (block.hidden ? " off" : "")} onClick={() => set({ hidden: !block.hidden })} title={block.hidden ? "Show in email" : "Hide from email"} aria-label="Toggle visibility">{block.hidden ? "◌" : "◉"}</button>
+          <span className="bswitch" title={block.hidden ? "Off — not in the email" : "On — in the email"}>
+            <Toggle on={!block.hidden} onChange={(v) => set({ hidden: !v })} label={block.hidden ? "Off" : "On"} />
+          </span>
         </div>
       </div>
       {open && (
@@ -122,7 +124,7 @@ export default function BuildPanel({ api, selected, setSelected }) {
 
   return (
     <div className="panel">
-      <p className="panel-tip">Tap a block to edit it. Use ↑ ↓ to reorder (or drag on desktop), ◉ to hide. Tap any section in the preview to jump to it.</p>
+      <p className="panel-tip">Switch any section On or Off for this email. Tap a section to edit it, ↑ ↓ to reorder. Tap any section in the preview to jump to it.</p>
       {blocks.map((b, i) => (
         <BlockCard
           key={b.id}

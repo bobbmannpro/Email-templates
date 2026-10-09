@@ -148,7 +148,7 @@ export const BLOCK_TYPES = {
     hint: "Cards for anyone on your roster",
     fields: [
       { key: "title", label: "Section title", type: "text" },
-      { key: "ids", label: "Who's included", type: "people" },
+      { key: "ids", label: "Who shows in this email", type: "people" },
       { key: "btnLabel", label: "Card button text", type: "text", help: "Leave blank for no button. {first} = first name" },
       { key: "btnUrl", label: "Card button link", type: "text" },
       { key: "showDetails", label: "Show availability & ages", type: "toggle" },
@@ -156,7 +156,7 @@ export const BLOCK_TYPES = {
     defaults: () => ({ title: "Meet Your Instructors", ids: [], btnLabel: "Book", btnUrl: "{book}", showDetails: true }),
     render(b, ctx) {
       const people = (b.ids || []).map((id) => ctx.roster.find((p) => p.id === id)).filter(Boolean);
-      if (!people.length) return "";
+      if (!people.length) return ctx.preview ? `<p style="font-size:12px;color:#9aa8b5;margin:0;text-align:center;">Instructor cards: nobody switched on — this section won't appear in the email.</p>` : "";
       const featured = people.filter((p) => p.featured);
       const others = people.filter((p) => !p.featured);
       const first = (p) => (p.name || "").split(" ")[0];

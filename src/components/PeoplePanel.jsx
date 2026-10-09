@@ -26,10 +26,30 @@ export default function PeoplePanel({ api }) {
     setOpen(p.id);
   };
   const ctx = { settings: doc.settings };
+  // "In email" = included in the email's Instructor cards section(s).
+  const cardBlocks = doc.blocks.filter((b) => b.type === "people");
+  const inEmail = (id) => cardBlocks.some((b) => (b.ids || []).includes(id));
+  const setInEmail = (id, v) =>
+    update((d) => ({
+      ...d,
+      blocks: d.blocks.map((b) =>
+        b.type !== "people" ? b : { ...b, ids: d.roster.map((p) => p.id).filter((pid) => (pid === id ? v : (b.ids || []).includes(pid))) }
+      ),
+    }));
+  const allInEmail = (v) => update((d) => ({ ...d, blocks: d.blocks.map((b) => (b.type === "people" ? { ...b, ids: v ? d.roster.map((p) => p.id) : [] } : b)) }));
 
   return (
     <div className="panel">
-      <p className="panel-tip">Your roster. Anyone here can go in Instructor cards or a Spotlight. Turn on <b>Featured</b> to give someone the big dark card.</p>
+      <p className="panel-tip">Your roster. Switch people <b>On</b> to show them in this email's instructor cards, <b>Off</b> to leave them out. Tap a name to edit. <b>Featured</b> gives someone the big dark card.</p>
+      {cardBlocks.length ? (
+        <div className="pp-bar top">
+          <span>{roster.filter((p) => inEmail(p.id)).length} of {roster.length} in this email</span>
+          <button type="button" className="link-btn inline" onClick={() => allInEmail(true)}>All on</button>
+          <button type="button" className="link-btn inline" onClick={() => allInEmail(false)}>All off</button>
+        </div>
+      ) : (
+        <p className="note warn">This email has no Instructor cards section yet — add one from Build → + Add a block → “Meet your instructors”.</p>
+      )}
       {roster.map((p, i) => {
         const src = photoUrl(p.photo, ctx);
         const isOpen = open === p.id;
@@ -44,6 +64,7 @@ export default function PeoplePanel({ api }) {
                 </span>
               </button>
               <div className="bctl">
+                {cardBlocks.length > 0 && <span className="bswitch"><Toggle on={inEmail(p.id)} onChange={(v) => setInEmail(p.id, v)} label={inEmail(p.id) ? "On" : "Off"} /></span>}
                 <button type="button" className="ib" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up">↑</button>
                 <button type="button" className="ib" onClick={() => move(i, 1)} disabled={i === roster.length - 1} aria-label="Move down">↓</button>
               </div>

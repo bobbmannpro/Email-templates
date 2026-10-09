@@ -90,38 +90,27 @@ export function ListField({ value = [], onChange, addLabel = "+ Add" }) {
 }
 
 function PeopleField({ value = [], onChange, roster }) {
-  const sel = value.filter((id) => roster.some((p) => p.id === id));
-  const unsel = roster.filter((p) => !sel.includes(p.id));
-  const move = (i, d) => {
-    const n = [...sel];
-    const j = i + d;
-    if (j < 0 || j >= n.length) return;
-    [n[i], n[j]] = [n[j], n[i]];
-    onChange(n);
-  };
+  const on = new Set(value);
+  // Keep roster order for the ones switched on.
+  const toggle = (id, v) => onChange(roster.filter((p) => (p.id === id ? v : on.has(p.id))).map((p) => p.id));
   return (
     <div className="people-pick">
-      {sel.map((id, i) => {
-        const p = roster.find((x) => x.id === id);
-        return (
-          <div className="pp-row on" key={id}>
-            <input type="checkbox" checked onChange={() => onChange(sel.filter((x) => x !== id))} aria-label={"Remove " + p.name} />
-            <span className="pp-name">{p.name}{p.featured && <em> · featured</em>}</span>
-            <button type="button" className="ib" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up">↑</button>
-            <button type="button" className="ib" onClick={() => move(i, 1)} disabled={i === sel.length - 1} aria-label="Move down">↓</button>
-          </div>
-        );
-      })}
-      {unsel.map((p) => (
-        <div className="pp-row" key={p.id}>
-          <input type="checkbox" checked={false} onChange={() => onChange([...sel, p.id])} aria-label={"Add " + p.name} />
-          <span className="pp-name muted">{p.name}</span>
+      <div className="pp-bar">
+        <span>{value.filter((id) => roster.some((p) => p.id === id)).length} of {roster.length} showing</span>
+        <button type="button" className="link-btn inline" onClick={() => onChange(roster.map((p) => p.id))}>All</button>
+        <button type="button" className="link-btn inline" onClick={() => onChange([])}>None</button>
+      </div>
+      {roster.map((p) => (
+        <div className={"pp-row" + (on.has(p.id) ? " on" : "")} key={p.id}>
+          <span className="pp-name">{p.name}{p.featured && <em> · featured</em>}<small>{p.avail}</small></span>
+          <Toggle on={on.has(p.id)} onChange={(v) => toggle(p.id, v)} />
         </div>
       ))}
       {!roster.length && <p className="note">Your roster is empty — add people in the People tab.</p>}
     </div>
   );
 }
+
 
 function TablesField({ value = [], onChange }) {
   const setT = (i, patch) => onChange(value.map((t, j) => (j === i ? { ...t, ...patch } : t)));
