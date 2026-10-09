@@ -6,7 +6,7 @@
 // Adding a new kind of section = adding one entry here.
 
 import {
-  esc, color, tint, onColor, md, plain, href, photoUrl, button, avatar, heading, eyebrow, tokens,
+  esc, color, tint, onColor, mix, md, plain, href, photoUrl, button, avatar, heading, eyebrow, tokens,
 } from "./render.js";
 
 const ALIGN = [["left", "Left"], ["center", "Center"], ["right", "Right"]];
@@ -70,7 +70,7 @@ export const BLOCK_TYPES = {
     render(b, ctx) {
       const bg = color(b.color, ctx, "highlight");
       const fg = onColor(bg, ctx.brand.primary);
-      return { bg, html: `<p style="font-family:${ctx.brand.headingFont};font-size:14px;color:${fg};font-weight:bold;margin:0;text-align:center;">${plain(b.title, ctx)}</p>` + (b.sub ? `<p style="font-size:11px;color:${fg};opacity:0.9;margin:3px 0 0;text-align:center;">${md(b.sub, ctx)}</p>` : "") };
+      return { bg, html: `<p style="font-family:${ctx.brand.headingFont};font-size:14px;color:${fg};font-weight:bold;margin:0;text-align:center;">${plain(b.title, ctx)}</p>` + (b.sub ? `<p style="font-size:11px;color:${mix(fg, bg, 0.9)};margin:3px 0 0;text-align:center;">${md(b.sub, ctx)}</p>` : "") };
     },
   },
 
@@ -122,7 +122,7 @@ export const BLOCK_TYPES = {
       const boxBg = dark ? c : b.style === "tint" ? tint(c, 0.9) : "#ffffff";
       const boxBorder = dark ? "none" : b.style === "plain" ? "none" : b.style === "outline" ? `2px solid ${c}` : `1px solid ${tint(c, 0.7)};border-left:4px solid ${c}`;
       const titleColor = dark ? "#ffffff" : ctx.brand.primary;
-      const bodyColor = dark ? "rgba(255,255,255,0.85)" : ctx.brand.text;
+      const bodyColor = dark ? mix("#ffffff", c, 0.85) : ctx.brand.text;
       const accent = dark ? ctx.brand.highlight : c;
       const logo = photoUrl(b.logo, ctx);
       const titleCell =
@@ -131,7 +131,7 @@ export const BLOCK_TYPES = {
       const top = logo
         ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;"><tr><td valign="middle">${titleCell}</td><td width="66" valign="middle" style="text-align:right;"><img src="${esc(logo)}" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;display:block;margin-left:auto;" /></td></tr></table>`
         : titleCell ? `<div style="margin-bottom:10px;">${titleCell}</div>` : "";
-      const btn = b.btnLabel ? `<div style="margin-top:14px;">${button(b.btnLabel, b.btnUrl, ctx, { bg: dark ? ctx.brand.highlight : c })}</div>` : "";
+      const btn = b.btnLabel ? button(b.btnLabel, b.btnUrl, ctx, { bg: dark ? ctx.brand.highlight : c, mt: 14 }) : "";
       return (
         `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${boxBg};border:${boxBorder};border-radius:10px;"><tr><td style="padding:16px 18px;">` +
         top +
@@ -168,7 +168,7 @@ export const BLOCK_TYPES = {
         if (!p.badge) return "";
         const auto = /\bavailable\b/i.test(p.badge) ? ctx.brand.success : ctx.brand.highlight;
         const c = p.badgeColor && p.badgeColor !== "auto" ? color(p.badgeColor, ctx) : auto;
-        const bg = dark ? "rgba(255,255,255,0.14)" : tint(c, 0.85);
+        const bg = dark ? mix("#ffffff", ctx.brand.primary, 0.16) : tint(c, 0.85);
         const fg = dark ? "#ffffff" : c;
         return `<span style="display:inline-block;font-size:9px;font-weight:bold;text-transform:uppercase;padding:3px 10px;border-radius:12px;background:${bg};color:${fg};margin-bottom:10px;">${plain(p.badge, ctx)}</span><br>`;
       };
@@ -179,28 +179,30 @@ export const BLOCK_TYPES = {
           `<td style="padding:16px 16px 16px 10px;vertical-align:middle;">` +
           `<p style="font-family:${ctx.brand.headingFont};font-size:16px;color:#fff;font-weight:bold;margin:0 0 2px;">${plain(p.name, ctx)}</p>` +
           `<p style="font-size:10px;color:${ctx.brand.highlight};font-weight:bold;margin:0 0 8px;">${plain(p.role, ctx)}</p>` +
-          details(p, "rgba(255,255,255,0.8)") + badge(p, true) +
+          details(p, mix("#ffffff", ctx.brand.primary, 0.8)) + badge(p, true) +
           (b.btnLabel ? button(tokens(b.btnLabel, ctx, { first: first(p) }), p.link || b.btnUrl, ctx, { bg: ctx.brand.highlight }) : "") +
           `</td></tr></table>`
         )
         .join("");
+      // Cards go two per row (no sideways scrolling — Outlook can't scroll and phones would overflow).
       const n = others.length;
-      const psz = n <= 1 ? 96 : n === 2 ? 86 : 72;
-      const cells = others
-        .map((p) =>
-          `<td style="width:${n <= 2 ? Math.floor(100 / n) + "%" : "140px"};min-width:${n > 2 ? "140px" : "0"};padding:0 4px;vertical-align:top;">` +
-          `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;"><tr><td style="padding:14px 8px;text-align:center;">` +
-          `<div style="margin-bottom:10px;">${avatar(p, psz, ctx, ctx.brand.accent)}</div>` +
-          `<p style="font-family:${ctx.brand.headingFont};font-size:14px;color:${ctx.brand.primary};font-weight:bold;margin:0 0 2px;">${plain(p.name, ctx)}</p>` +
-          `<p style="font-size:10px;color:${ctx.brand.accent};font-weight:bold;margin:0 0 8px;">${plain(p.role, ctx)}</p>` +
-          details(p, ctx.brand.muted) + badge(p, false) +
-          (b.btnLabel ? button(tokens(b.btnLabel, ctx, { first: first(p) }), p.link || b.btnUrl, ctx, { size: "sm" }) : "") +
-          `</td></tr></table></td>`
-        )
-        .join("");
-      const grid = n
-        ? `<div style="${n > 2 ? "overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;display:block;padding-bottom:4px;" : ""}"><table cellpadding="0" cellspacing="0" border="0" style="${n <= 2 ? "width:100%;table-layout:fixed;" : ""}"><tr>${cells}</tr></table></div>`
-        : "";
+      const psz = n === 1 ? 96 : 76;
+      const card = (p) =>
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f7f9" style="background-color:#f5f7f9;border:1px solid #e8ecf0;border-radius:12px;"><tr><td align="center" style="padding:14px 8px;text-align:center;">` +
+        `<div style="padding-bottom:10px;">${avatar(p, psz, ctx, ctx.brand.accent)}</div>` +
+        `<p style="font-family:${ctx.brand.headingFont};font-size:14px;color:${ctx.brand.primary};font-weight:bold;margin:0 0 2px;">${plain(p.name, ctx)}</p>` +
+        `<p style="font-size:10px;color:${ctx.brand.accent};font-weight:bold;margin:0 0 8px;">${plain(p.role, ctx)}</p>` +
+        details(p, ctx.brand.muted) + badge(p, false) +
+        (b.btnLabel ? button(tokens(b.btnLabel, ctx, { first: first(p) }), p.link || b.btnUrl, ctx, { size: "sm", align: "center" }) : "") +
+        `</td></tr></table>`;
+      let grid = "";
+      for (let i = 0; i < n; i += 2) {
+        const pair = others.slice(i, i + 2);
+        const cells = pair.length === 2
+          ? pair.map((p, k) => `<td width="50%" valign="top" style="width:50%;vertical-align:top;padding:0 ${k === 0 ? 5 : 0}px 10px ${k === 1 ? 5 : 0}px;">${card(p)}</td>`).join("")
+          : `<td width="25%" style="width:25%;"></td><td width="50%" valign="top" style="width:50%;vertical-align:top;padding-bottom:10px;">${card(pair[0])}</td><td width="25%" style="width:25%;"></td>`;
+        grid += `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;"><tr>${cells}</tr></table>`;
+      }
       return heading(b.title, ctx) + featHtml + grid;
     },
   },
@@ -241,10 +243,10 @@ export const BLOCK_TYPES = {
         `<td style="padding:16px 14px 16px 6px;vertical-align:top;">` +
         `<p style="font-family:${ctx.brand.headingFont};font-size:15px;color:${dark ? "#fff" : ctx.brand.primary};font-weight:bold;margin:0 0 2px;">${plain(p.name, ctx)}</p>` +
         `<p style="font-size:10px;color:${dark ? ctx.brand.highlight : ctx.brand.accent};font-weight:bold;text-transform:uppercase;margin:0 0 8px;">${plain(p.role, ctx)}</p>` +
-        (b.bio ? `<p style="font-size:12px;color:${dark ? "rgba(255,255,255,0.85)" : ctx.brand.muted};line-height:1.6;margin:0 0 8px;">${md(b.bio, ctx, { extra: { first } })}</p>` : "") +
+        (b.bio ? `<p style="font-size:12px;color:${dark ? mix("#ffffff", ctx.brand.primary, 0.85) : ctx.brand.muted};line-height:1.6;margin:0 0 8px;">${md(b.bio, ctx, { extra: { first } })}</p>` : "") +
         (b.fun ? `<p style="font-size:11px;color:${ctx.brand.highlight};font-weight:bold;margin:0;">⭐ ${plain(b.fun, ctx)}</p>` : "") +
         `</td></tr></table>` +
-        (b.btnLabel ? `<p style="text-align:center;margin:12px 0 0;">${button(tokens(b.btnLabel, ctx, { first }), (r && r.link) || b.btnUrl, ctx, { bg: dark ? ctx.brand.highlight : ctx.brand.accent })}</p>` : "")
+        (b.btnLabel ? button(tokens(b.btnLabel, ctx, { first }), (r && r.link) || b.btnUrl, ctx, { bg: dark ? ctx.brand.highlight : ctx.brand.accent, align: "center", mt: 12 }) : "")
       );
     },
   },
@@ -296,7 +298,7 @@ export const BLOCK_TYPES = {
         : "";
       return (
         heading(b.title, ctx) + badge + tables +
-        (b.btnLabel ? `<p style="text-align:center;margin:14px 0 0;">${button(b.btnLabel, b.btnUrl, ctx)}</p>` : "") +
+        (b.btnLabel ? button(b.btnLabel, b.btnUrl, ctx, { align: "center", mt: 14 }) : "") +
         (b.note ? `<p style="font-size:11px;color:#9aa8b5;text-align:center;margin:8px 0 0;">${md(b.note, ctx)}</p>` : "")
       );
     },
@@ -315,20 +317,23 @@ export const BLOCK_TYPES = {
     render(b, ctx) {
       const f = ctx.forecast || [];
       if (!f.length) return ctx.preview ? `<p style="font-size:12px;color:#9aa8b5;margin:0;text-align:center;">Weather: no forecast loaded yet (Settings → Dates &amp; Weather)</p>` : "";
-      const cells = f
-        .map(
-          (d) =>
-            `<td style="text-align:center;background:#f5f7f9;border:1px solid #e8ecf0;border-radius:8px;padding:8px 4px;min-width:56px;">` +
-            `<p style="font-size:8px;font-weight:bold;color:#9aa8b5;text-transform:uppercase;margin:0;white-space:nowrap;">${esc(d.day)}</p>` +
-            `<p style="font-size:15px;margin:2px 0;">${esc(d.icon)}</p>` +
-            `<p style="font-size:13px;font-weight:bold;color:${ctx.brand.primary};margin:0;">${esc(d.high)}</p>` +
-            `<p style="font-size:10px;color:#9aa8b5;margin:1px 0;">${esc(d.low)}</p>` +
-            `<p style="font-size:8px;color:#9aa8b5;margin:2px 0 0;">${esc(d.rain)}</p></td>`
-        )
-        .join("");
+      // Up to 4 days per row so it fits a 320px phone without sideways scrolling.
+      const cell = (d) =>
+        `<td width="25%" align="center" valign="top" style="width:25%;padding:3px;">` +
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f7f9" style="background-color:#f5f7f9;border:1px solid #e8ecf0;border-radius:8px;"><tr><td align="center" style="padding:8px 2px;text-align:center;">` +
+        `<p style="font-size:9px;font-weight:bold;color:#8796a5;text-transform:uppercase;margin:0;">${esc(d.day)}</p>` +
+        `<p style="font-size:16px;margin:2px 0;">${esc(d.icon)}</p>` +
+        `<p style="font-size:14px;font-weight:bold;color:${ctx.brand.primary};margin:0;">${esc(d.high)}</p>` +
+        `<p style="font-size:11px;color:#8796a5;margin:1px 0;">${esc(d.low)}</p>` +
+        `<p style="font-size:9px;color:#8796a5;margin:2px 0 0;">${esc(d.rain)}</p></td></tr></table></td>`;
+      let rows = "";
+      for (let i = 0; i < f.length; i += 4) {
+        const row = f.slice(i, i + 4);
+        rows += `<tr>${row.map(cell).join("")}${"<td width=\"25%\" style=\"width:25%;\"></td>".repeat(4 - row.length)}</tr>`;
+      }
       return (
         heading(tokens(b.title, ctx, { days: f.length }), ctx) +
-        `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;display:block;"><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;border-spacing:4px;"><tr>${cells}</tr></table></div>` +
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;">${rows}</table>` +
         (b.note ? `<p style="font-size:11px;color:#9aa8b5;margin:8px 0 0;">${plain(b.note, ctx)}</p>` : "")
       );
     },
@@ -413,9 +418,9 @@ export const BLOCK_TYPES = {
         html:
           `<div style="text-align:center;padding:8px 0;">` +
           heading(b.title, ctx, { size: 20, color: fg, align: "center", margin: "0 0 6px" }) +
-          (b.sub ? `<p style="font-size:13px;color:${fg};opacity:0.7;margin:0 0 16px;">${md(b.sub, ctx)}</p>` : "") +
-          button(b.btnLabel, b.btnUrl, ctx, { bg: ctx.brand.highlight, size: "lg" }) +
-          (b.foot ? `<p style="font-size:12px;color:${fg};opacity:0.6;margin:14px 0 0;">${md(b.foot, ctx).replace(new RegExp(`color:${ctx.brand.accent}`, "g"), `color:${ctx.brand.highlight}`)}</p>` : "") +
+          (b.sub ? `<p style="font-size:13px;color:${mix(fg, bg, 0.7)};margin:0 0 16px;">${md(b.sub, ctx)}</p>` : "") +
+          button(b.btnLabel, b.btnUrl, ctx, { bg: ctx.brand.highlight, size: "lg", align: "center" }) +
+          (b.foot ? `<p style="font-size:12px;color:${mix(fg, bg, 0.6)};margin:14px 0 0;">${md(b.foot, ctx).replace(new RegExp(`color:${ctx.brand.accent}`, "g"), `color:${ctx.brand.highlight}`)}</p>` : "") +
           `</div>`,
       };
     },

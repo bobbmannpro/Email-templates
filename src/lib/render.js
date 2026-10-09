@@ -26,6 +26,15 @@ export function tint(hex, amount = 0.9) {
   return "#" + ch.map((c) => c.toString(16).padStart(2, "0")).join("");
 }
 
+/** Blend fg over bg at alpha (hex only) — a solid stand-in for rgba(), which Outlook ignores. */
+export function mix(fg, bg, a) {
+  const h = (x) => { const m = /^#?([0-9a-f]{6})$/i.exec((x || "").trim()); return m ? parseInt(m[1], 16) : null; };
+  const f = h(fg), b = h(bg);
+  if (f == null || b == null) return fg;
+  const ch = [16, 8, 0].map((sh) => Math.round(((f >> sh) & 255) * a + ((b >> sh) & 255) * (1 - a)));
+  return "#" + ch.map((c) => c.toString(16).padStart(2, "0")).join("");
+}
+
 /** Pick black or white text for a background color. */
 export function onColor(hex, dark = "#0b2545") {
   const m = /^#?([0-9a-f]{6})$/i.exec((hex || "").trim());
@@ -104,26 +113,37 @@ export function photoUrl(photo, ctx) {
   return ctx.settings.imageBase.replace(/\/$/, "") + "/" + p.replace(/^\//, "");
 }
 
-export function button(label, url, ctx, { bg, fg, size = "md", align } = {}) {
+/**
+ * "Bulletproof" button: the color and padding live on a table cell, so it keeps its
+ * shape in Outlook desktop (which ignores padding on links) as well as Gmail/Yahoo/Apple.
+ */
+export function button(label, url, ctx, { bg, fg, size = "md", align, mt = 0 } = {}) {
   const h = href(url, ctx);
   if (!label || !h) return "";
   const b = bg || ctx.brand.accent;
   const f = fg || onColor(b);
   const pad = size === "lg" ? "12px 30px" : size === "sm" ? "7px 16px" : "9px 22px";
   const fs = size === "lg" ? 14 : size === "sm" ? 11 : 12;
-  const a = `<a href="${esc(h)}" style="display:inline-block;background:${b};color:${f};font-family:${ctx.brand.font};font-size:${fs}px;font-weight:bold;text-decoration:none;padding:${pad};border-radius:24px;">${plain(label, ctx)}</a>`;
-  return align ? `<p style="text-align:${align};margin:0;">${a}</p>` : a;
+  const al = align === "center" ? ' align="center"' : align === "right" ? ' align="right"' : "";
+  return (
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0"${al} style="border-collapse:separate;${align === "center" ? "margin:" + mt + "px auto 0;" : "margin-top:" + mt + "px;"}">` +
+    `<tr><td bgcolor="${b}" style="background-color:${b};border-radius:24px;padding:${pad};mso-padding-alt:${pad};text-align:center;">` +
+    `<a href="${esc(h)}" target="_blank" style="color:${f};font-family:${ctx.brand.font};font-size:${fs}px;font-weight:bold;line-height:1.2;text-decoration:none;display:inline-block;">${plain(label, ctx)}</a>` +
+    `</td></tr></table>`
+  );
 }
 
 export function avatar(person, size, ctx, ring) {
   const src = photoUrl(person.photo, ctx);
   const border = ring ? `border:3px solid ${ring};` : "";
+  let inner;
   if (src) {
-    return `<img src="${esc(src)}" alt="${esc(person.name)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;${border}display:block;margin:0 auto;" />`;
+    inner = `<img src="${esc(src)}" alt="${esc(person.name)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;${border}display:block;" />`;
+  } else {
+    const bg = color(person.color, ctx, "accent");
+    inner = `<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="${size}" height="${size}" bgcolor="${bg}" align="center" valign="middle" style="width:${size}px;height:${size}px;border-radius:50%;background-color:${bg};${border}font-family:${ctx.brand.font};font-size:${Math.floor(size * 0.28)}px;font-weight:bold;color:${onColor(bg)};text-align:center;">${esc(initials(person.name || "?"))}</td></tr></table>`;
   }
-  const bg = color(person.color, ctx, "accent");
-  const ini = initials(person.name || "?");
-  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};text-align:center;line-height:${size}px;font-size:${Math.floor(size * 0.28)}px;font-weight:bold;color:${onColor(bg)};${border}margin:0 auto;">${esc(ini)}</div>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;"><tr><td align="center">${inner}</td></tr></table>`;
 }
 
 export function initials(name) {

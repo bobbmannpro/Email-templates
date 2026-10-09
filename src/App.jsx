@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDoc, usePresets } from "./hooks/useDoc.js";
-import { exportHtml } from "./lib/email.js";
+import { exportHtml, checkEmail } from "./lib/email.js";
 import BuildPanel from "./components/BuildPanel.jsx";
 import PeoplePanel from "./components/PeoplePanel.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
@@ -134,6 +134,10 @@ function ExportBar({ api, copy, downloadHtml }) {
       {s.subject && <button type="button" className="btn ghost" onClick={() => copy(s.subject, "Subject")}>Copy subject</button>}
       <button type="button" className="btn ghost" onClick={downloadHtml}>⬇ .html</button>
       <p className="note">Body only (banner through signature) — paste it into the Cooper email builder, which adds the logo header and footer.</p>
+      <p className="checks-title">Inbox check</p>
+      <ul className="checks">
+        {checkEmail(api.doc).map((c, i) => <li key={i} className={c.level}>{c.msg}</li>)}
+      </ul>
     </div>
   );
 }

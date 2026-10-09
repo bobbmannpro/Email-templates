@@ -70,3 +70,30 @@ describe("renderEmail", () => {
     expect(d.blocks[0].id).toBeTruthy();
   });
 });
+
+describe("inbox compatibility", () => {
+  const all = () => {
+    const doc = defaultDoc();
+    doc.blocks = [...TEMPLATES.map(fromTemplate), ...Object.keys(BLOCK_TYPES).filter((t) => t !== "html").map((t) => createBlock(t))];
+    doc.forecast = Array.from({ length: 7 }, (_, i) => ({ day: "Mon " + i, icon: "☀️", high: "80°", low: "60°", rain: "2%" }));
+    return exportHtml(doc);
+  };
+  it("uses no rgba(), opacity, flex/grid, or scrolling containers", () => {
+    const h = all();
+    expect(h).not.toMatch(/rgba\(|opacity:0\.|display:flex|display:grid|overflow-x/);
+  });
+  it("has the Outlook 600px ghost table", () => {
+    expect(all()).toContain('<!--[if mso]><table role="presentation" width="600"');
+  });
+  it("buttons are bulletproof table cells", () => {
+    const h = all();
+    expect(h).toMatch(/<td bgcolor="#[0-9a-f]{6}" style="background-color:#[0-9a-f]{6};border-radius:24px;padding:/);
+    expect(h).not.toMatch(/<a [^>]*style="display:inline-block;background/);
+  });
+  it("has no <style> tags or classes", () => {
+    expect(all()).not.toMatch(/<style|class="/);
+  });
+  it("stays well under Gmail's 102KB clip for a normal email", () => {
+    expect(new Blob([exportHtml(defaultDoc())]).size).toBeLessThan(60000);
+  });
+});
