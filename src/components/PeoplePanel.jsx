@@ -18,7 +18,6 @@ export default function PeoplePanel({ api }) {
       return { ...d, roster: r };
     });
   const remove = (id) => {
-    if (!confirm("Remove this person from the roster? They'll disappear from any instructor cards.")) return;
     update((d) => ({ ...d, roster: d.roster.filter((p) => p.id !== id) }));
   };
   const add = () => {

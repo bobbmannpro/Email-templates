@@ -15,6 +15,7 @@ export default function PresetsMenu({ api, presets, onClose }) {
   const { presets: list, savePreset, deletePreset, importPresets } = presets;
   const [name, setName] = useState(doc.name || "");
   const [msg, setMsg] = useState("");
+  const [armed, setArmed] = useState(null);
   const fileRef = useRef(null);
   const today = new Date().toISOString().slice(0, 10);
 
@@ -58,15 +59,17 @@ export default function PresetsMenu({ api, presets, onClose }) {
                   <strong>{p.name}</strong>
                   <small>{p.blocks.length} blocks · saved {p.savedAt ? new Date(p.savedAt).toLocaleDateString() : ""}</small>
                 </button>
-                <button type="button" className="ib danger" onClick={() => confirm(`Delete “${p.name}”?`) && deletePreset(p.name)} aria-label="Delete preset">×</button>
+                {armed === p.name
+                  ? <button type="button" className="btn sm danger" onClick={() => { deletePreset(p.name); setArmed(null); }}>Delete?</button>
+                  : <button type="button" className="ib danger" onClick={() => setArmed(p.name)} aria-label="Delete preset">×</button>}
               </div>
             ))}
             {!Object.keys(list).length && <p className="empty">No saved presets yet.</p>}
           </div>
 
           <div className="row-inline wrap">
-            <button type="button" className="btn sm ghost" onClick={() => { if (confirm("Start a blank email? (You can Undo.)")) { replace({ ...defaultDoc(), name: "Untitled", blocks: [] }); onClose(); } }}>New blank email</button>
-            <button type="button" className="btn sm ghost" onClick={() => { if (confirm("Load the default weekly email? (You can Undo.)")) { replace(defaultDoc()); onClose(); } }}>Default weekly email</button>
+            <button type="button" className="btn sm ghost" onClick={() => { replace({ ...defaultDoc(), name: "Untitled", blocks: [] }); onClose(); }}>New blank email</button>
+            <button type="button" className="btn sm ghost" onClick={() => { replace(defaultDoc()); onClose(); }}>Default weekly email</button>
           </div>
           <div className="row-inline wrap">
             <button type="button" className="btn sm ghost" onClick={() => download(`swim-email-${today}.json`, doc)}>⬇ Export this email</button>
@@ -74,7 +77,7 @@ export default function PresetsMenu({ api, presets, onClose }) {
             <button type="button" className="btn sm ghost" onClick={() => fileRef.current.click()}>⬆ Import</button>
             <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onImport} />
           </div>
-          <p className="note">Presets live in this browser. Export them to back up or move to another device.</p>
+          <p className="note">Loading a preset or starting fresh can be undone with ↶. Presets live in this browser. Export them to back up or move to another device.</p>
         </div>
       </div>
     </div>
