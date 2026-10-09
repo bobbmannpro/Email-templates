@@ -1,37 +1,28 @@
-# Cooper Swim Email Generator
+# Swim Emails
 
-## Quick Start (local)
+Block-based email builder for Cooper swim emails. Every section is a block you can add, edit, duplicate, hide, reorder, or delete. Nothing is hard-coded: rates, pool info, people, colors, links, and text are all editable in the app.
+
+## How it works
+- **Build**: tap a block to edit it. Use **+ Add a block** for ready-made sections (pool location, rates, Cyclones, triathlon, spotlight…) or blank blocks (text, heading, callout, image, video, button, rates, people, weather, divider, signature, custom HTML).
+- **People**: your instructor roster. Anyone can be **Featured** (the big dark card).
+- **Settings**: dates and weather, subject and preview text, booking link and email, brand colors and fonts.
+- **📁 Saved**: save and load presets (for example "Weekly Lessons" or "Cyclones Recruiting"), and export or import them as JSON for backups.
+- **Copy HTML**: body-only HTML (banner through signature). The Cooper email builder adds the logo header and footer.
+
+Text shortcuts work in any text box: `**bold**`, `*italic*`, `[label](link)`, and `- ` at the start of a line for a bullet. Tokens: `{book}` `{email}` `{phone}` `{dates}` `{first}`.
+
+## Develop
 ```bash
 npm install
-npm run dev
+npm run dev     # local
+npm test        # renderer tests
+npm run build
 ```
+Pushing to `main` deploys to GitHub Pages (`.github/workflows/deploy.yml`).
 
-## Deploy to Netlify (Free — handles API key securely)
-
-### 1. Push to GitHub
-```bash
-git init && git add . && git commit -m "init"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/cooper-swim-email.git
-git push -u origin main
-```
-
-### 2. Connect to Netlify
-1. Go to app.netlify.com → sign in with GitHub
-2. Add new site → Import existing project → pick your repo
-3. Build settings auto-detected from netlify.toml
-4. Click Deploy
-
-### 3. Add your Anthropic API key
-1. Netlify dashboard → Site configuration → Environment variables
-2. Add variable: `ANTHROPIC_API_KEY` = your key from console.anthropic.com
-3. Save → Trigger redeploy
-
-AI features (weather fetch + header generator) will work on your live URL.
-
-## Photos
-Drop in `public/photos/`:
-- bobby.jpg, riley-niksich.jpg, riley-dyke.jpg
-- madeline-shaw.jpg, peyton-ganss.jpg, ayden-benel.jpg
-
-Square crop, min 200×200px, under 500KB.
+## Code map
+- `src/lib/blocks.js`: every block type (fields + HTML renderer). Add a new kind of section here.
+- `src/lib/defaults.js`: starting brand, roster, ready-made templates, and the default email.
+- `src/lib/email.js`: assembles the body-only email HTML and the preview page.
+- `src/components/`: editor UI.
+- Photos live in `public/photos/`. Pick them by filename or paste any image URL.

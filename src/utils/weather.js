@@ -1,4 +1,13 @@
-import { SEASONAL_TEMPS, COND_LIST, WEATHER_LAT, WEATHER_LON } from "../config.js";
+// Dallas seasonal [high, low] baselines by month, used for "Estimate" forecasts.
+const SEASONAL_TEMPS = [
+  [57, 37], [62, 41], [70, 48], [78, 57], [85, 65],
+  [93, 73], [97, 77], [97, 77], [90, 70], [80, 59],
+  [68, 48], [59, 39],
+];
+export const COND_LIST = [
+  "Sunny", "Mostly Sunny", "Partly Cloudy", "Mostly Cloudy",
+  "Cloudy", "Scattered Showers", "Rain", "Thunderstorms", "Fog",
+];
 import { dayLabel } from "./date.js";
 
 // WMO weather interpretation codes → condition string
@@ -26,10 +35,10 @@ const WMO_TO_COND = {
  * @param {string} endDate - ISO date string (YYYY-MM-DD)
  * @returns {Promise<Array<{day,icon,high,low,rain}>>}
  */
-export async function fetchRealWeather(startDate, endDate) {
+export async function fetchRealWeather(startDate, endDate, lat = 32.87, lon = -96.76) {
   const url = new URL("https://api.open-meteo.com/v1/forecast");
-  url.searchParams.set("latitude", WEATHER_LAT);
-  url.searchParams.set("longitude", WEATHER_LON);
+  url.searchParams.set("latitude", lat);
+  url.searchParams.set("longitude", lon);
   url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max");
   url.searchParams.set("temperature_unit", "fahrenheit");
   url.searchParams.set("timezone", "America/Chicago");
@@ -105,5 +114,3 @@ export function generateWeather(startDate, count) {
   });
 }
 
-// Re-export so consumers don't need to import from config directly
-export { COND_LIST };
