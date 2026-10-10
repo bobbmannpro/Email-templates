@@ -25,7 +25,7 @@ export default function PeoplePanel({ api }) {
     update((d) => ({ ...d, roster: [...d.roster, p] }));
     setOpen(p.id);
   };
-  const ctx = { settings: doc.settings };
+  const ctx = { settings: doc.settings, useCache: true };
   // "In email" = included in the email's Instructor cards section(s).
   const cardBlocks = doc.blocks.filter((b) => b.type === "people");
   const inEmail = (id) => cardBlocks.some((b) => (b.ids || []).includes(id));
@@ -75,7 +75,7 @@ export default function PeoplePanel({ api }) {
                   <label className="field"><Label>Name</Label><TextInput value={p.name} onChange={(v) => setP(p.id, { name: v })} /></label>
                   <label className="field"><Label>Role / title</Label><TextInput value={p.role} onChange={(v) => setP(p.id, { role: v })} /></label>
                 </div>
-                <div className="field block-field"><Label>Photo</Label><ImageField value={p.photo} onChange={(v) => setP(p.id, { photo: v })} /></div>
+                <div className="field block-field"><Label>Photo</Label><ImageField value={p.photo} onChange={(v) => setP(p.id, { photo: v })} nameHint={p.name} square /></div>
                 <div className="row2">
                   <label className="field"><Label>Availability</Label><TextInput value={p.avail} onChange={(v) => setP(p.id, { avail: v })} placeholder="Sat & Sun" /></label>
                   <label className="field"><Label>Ages</Label><TextInput value={p.ages} onChange={(v) => setP(p.id, { ages: v })} placeholder="All ages" /></label>

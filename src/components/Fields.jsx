@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getToken, listPhotos, preparePhoto, setToken, slug, testToken, uploadPhoto } from "../lib/photos.js";
 import { BRAND_TOKENS, PHOTO_FILES } from "../lib/defaults.js";
 import { IDEA_TOPICS } from "../lib/ideas.js";
 
@@ -51,17 +52,101 @@ export function ColorField({ value, onChange, brand, allowNone }) {
   );
 }
 
-/** Photo/image field: pick a hosted photo or paste any URL. */
-export function ImageField({ value, onChange }) {
-  const custom = value && !PHOTO_FILES.includes(value);
+/** Photo/image field: upload a new photo, pick one already on the site, or paste any URL. */
+let photoListPromise = null;
+function usePhotoList() {
+  const [list, setList] = useState(PHOTO_FILES);
+  useEffect(() => {
+    photoListPromise = photoListPromise || listPhotos(PHOTO_FILES);
+    let live = true;
+    photoListPromise.then((l) => live && setList(l));
+    return () => { live = false; };
+  }, []);
+  return [list, (name) => setList((l) => (l.includes(name) ? l : [...l, name].sort()))];
+}
+
+export function GitHubConnect({ onDone }) {
+  const [tok, setTok] = useState("");
+  const [msg, setMsg] = useState(null);
+  const [busy, setBusy] = useState(false);
+  async function save() {
+    setBusy(true);
+    setToken(tok);
+    const r = await testToken();
+    setMsg(r);
+    setBusy(false);
+    if (r.ok) onDone && onDone();
+    else setToken("");
+  }
+  return (
+    <div className="gh-connect">
+      <p className="note"><b>One-time setup:</b> photos go on your GitHub site so every email app can show them. Paste a GitHub key once and uploads just work on this device.</p>
+      <ol className="steps">
+        <li>Open <a href={`https://github.com/settings/personal-access-tokens/new`} target="_blank" rel="noreferrer">GitHub → new fine-grained token</a>.</li>
+        <li>Name it “Swim Emails”, set expiration to 1 year.</li>
+        <li>Repository access → <b>Only select repositories</b> → <b>Email-templates</b>.</li>
+        <li>Permissions → Repository → <b>Contents: Read and write</b>.</li>
+        <li>Generate, copy it, paste below.</li>
+      </ol>
+      <div className="row-inline">
+        <input className="inp" type="password" autoComplete="off" value={tok} onChange={(e) => setTok(e.target.value)} placeholder="github_pat_…" aria-label="GitHub key" />
+        <button type="button" className="btn sm" disabled={!tok.trim() || busy} onClick={save}>{busy ? "Checking…" : "Connect"}</button>
+      </div>
+      {msg && <p className={"note " + (msg.ok ? "ok" : "warn")}>{msg.msg}</p>}
+      <p className="note">The key is saved only in this browser — never in your emails or presets.</p>
+    </div>
+  );
+}
+
+export function ImageField({ value, onChange, nameHint, square }) {
+  const [list, addToList] = usePhotoList();
+  const [state, setState] = useState({ busy: false, err: "", ok: "" });
+  const [needKey, setNeedKey] = useState(false);
+  const pending = useRef(null);
+  const fileRef = useRef(null);
+  const custom = value && !list.includes(value);
+
+  async function doUpload(file) {
+    setState({ busy: true, err: "", ok: "" });
+    try {
+      const prepared = await preparePhoto(file, { square: !!square });
+      const base = nameHint ? slug(nameHint) : "image-" + new Date().toISOString().slice(0, 10);
+      const name = `${base}-${Date.now().toString(36).slice(-4)}.jpg`;
+      await uploadPhoto(name, prepared.base64, prepared.dataUrl);
+      addToList(name);
+      onChange(name);
+      setState({ busy: false, err: "", ok: "Uploaded ✓ — it shows here now and in sent emails within ~2 minutes." });
+    } catch (e) {
+      setState({ busy: false, err: e.message, ok: "" });
+    }
+  }
+  function onFile(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!getToken()) { pending.current = file; setNeedKey(true); return; }
+    doUpload(file);
+  }
+
   return (
     <div className="img-field">
-      <select className="inp" value={custom ? "__url" : value || ""} onChange={(e) => onChange(e.target.value === "__url" ? "https://" : e.target.value)}>
-        <option value="">— None —</option>
-        {PHOTO_FILES.map((f) => <option key={f} value={f}>{f}</option>)}
-        <option value="__url">Paste an image URL…</option>
-      </select>
+      <div className="row-inline">
+        <button type="button" className="btn sm" disabled={state.busy} onClick={() => fileRef.current.click()}>
+          {state.busy ? "Uploading…" : "📷 Upload photo"}
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} />
+        <select className="inp" value={custom ? "__url" : value || ""} onChange={(e) => onChange(e.target.value === "__url" ? "https://" : e.target.value)} aria-label="Choose a photo">
+          <option value="">— No photo —</option>
+          {list.map((f) => <option key={f} value={f}>{f}</option>)}
+          <option value="__url">Paste an image URL…</option>
+        </select>
+      </div>
       {custom && <TextInput value={value} onChange={onChange} placeholder="https://…/photo.jpg" />}
+      {state.ok && <p className="note ok">{state.ok}</p>}
+      {state.err && <p className="note warn">{state.err}</p>}
+      {needKey && (
+        <GitHubConnect onDone={() => { setNeedKey(false); if (pending.current) { doUpload(pending.current); pending.current = null; } }} />
+      )}
     </div>
   );
 }

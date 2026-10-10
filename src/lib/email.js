@@ -8,6 +8,7 @@ export function makeCtx(doc, opts = {}) {
     roster: doc.roster || [],
     forecast: doc.forecast || [],
     preview: !!opts.preview,
+    useCache: !!opts.preview,
   };
 }
 

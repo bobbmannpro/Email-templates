@@ -2,7 +2,8 @@ import { useState } from "react";
 import { DEFAULT_SETTINGS } from "../lib/defaults.js";
 import { fetchRealWeather, generateWeather, weatherIcon, COND_LIST } from "../utils/weather.js";
 import { numDays, fmtDate } from "../utils/date.js";
-import { TextInput, Label } from "./Fields.jsx";
+import { TextInput, Label, GitHubConnect } from "./Fields.jsx";
+import { getToken, setToken } from "../lib/photos.js";
 
 const FONTS = [
   ["Arial,Helvetica,sans-serif", "Arial"],
@@ -93,6 +94,17 @@ function WeatherEditor({ api }) {
   );
 }
 
+function PhotoUploads() {
+  const [has, setHas] = useState(!!getToken());
+  if (has) return (
+    <>
+      <p className="note ok">Connected to GitHub on this device — use “📷 Upload photo” on any person or image.</p>
+      <button type="button" className="link-btn" onClick={() => { setToken(""); setHas(false); }}>Disconnect / use a new key</button>
+    </>
+  );
+  return <GitHubConnect onDone={() => setHas(true)} />;
+}
+
 export default function SettingsPanel({ api }) {
   const { doc, update } = api;
   const s = doc.settings;
@@ -122,6 +134,10 @@ export default function SettingsPanel({ api }) {
         <label className="field"><Label help="Use {email}">Contact email</Label><TextInput value={s.links.email} onChange={(v) => setGroup("links", "email", v)} /></label>
         <label className="field"><Label help="Use {phone}">Phone</Label><TextInput value={s.links.phone} onChange={(v) => setGroup("links", "phone", v)} /></label>
         <label className="field"><Label help="Where photo filenames like bobby.jpg are hosted">Photo folder URL</Label><TextInput value={s.imageBase} onChange={(v) => setS({ imageBase: v }, "img")} /></label>
+      </Section>
+
+      <Section title="📷 Photo uploads">
+        <PhotoUploads />
       </Section>
 
       <Section title="🎨 Brand colors & fonts">

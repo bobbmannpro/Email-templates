@@ -2,6 +2,7 @@
 // Everything here outputs inline-styled, table-based HTML so it survives email clients.
 
 import { fmtDate } from "../utils/date.js";
+import { photoCache } from "./photos.js";
 
 export function esc(s) {
   return String(s ?? "")
@@ -110,6 +111,8 @@ export function photoUrl(photo, ctx) {
   const p = (photo || "").trim();
   if (!p) return "";
   if (/^(https?:|data:)/i.test(p)) return p;
+  // Just-uploaded photos: show the local copy in the editor until GitHub finishes publishing.
+  if (ctx.useCache && photoCache()[p]) return photoCache()[p];
   return ctx.settings.imageBase.replace(/\/$/, "") + "/" + p.replace(/^\//, "");
 }
 
